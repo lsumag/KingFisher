@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/soundactivitybgmain"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ChangeActivity" android:text="Change Activity" android:layout_centerHorizontal="true" android:layout_centerVertical="true"></Button>
+
+<Button android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_width="wrap_content" android:layout_centerVertical="true" android:id="@+id/PlaySound1" android:text="Play Sound 1" android:layout_below="@+id/ChangeActivity"></Button>
+<Button android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_width="wrap_content" android:id="@+id/PlaySound2" android:text="Play Sound 2" android:layout_below="@+id/PlaySound1"></Button>
+</RelativeLayout>

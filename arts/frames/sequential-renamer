@@ -1,0 +1,7 @@
+#!/bin/bash
+count="0"
+for file in *.jpeg
+do
+mv "$file" $(printf 'cast_animation_%02d.jpeg' $count)
+(( count++ ))
+done
