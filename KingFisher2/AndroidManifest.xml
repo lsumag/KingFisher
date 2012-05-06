@@ -6,18 +6,26 @@
 
     <uses-sdk android:minSdkVersion="7" />
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:label="@string/app_name"
-            android:name=".KingFisher2Activity" >
+            android:label="@string/app_name" android:name=".KingFisher2Activity" android:noHistory="true">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:label="@string/app_name" android:name=".Intro" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".ModeSelection" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".LevelSelection" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".TravelScene" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".Caster" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".Reeler" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".Shaker" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".Rejecterator" android:noHistory="true" />
     </application>
 
 </manifest>

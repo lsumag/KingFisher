@@ -2,6 +2,7 @@ package org.MAG;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,6 +12,8 @@ import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 
 public class Caster extends Activity implements OnTouchListener, SensorEventListener {
@@ -26,13 +29,17 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        
         setContentView(R.layout.caster);
         
         //TODO: instructional audio
         
         //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
         
-        //TODO: register listeners
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);

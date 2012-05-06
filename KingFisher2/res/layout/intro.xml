@@ -7,7 +7,7 @@
     <ImageView android:id="@+id/title_image"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:src="@drawable/title_screen"
+    android:background="@drawable/title_screen"
     />
 
 </LinearLayout>

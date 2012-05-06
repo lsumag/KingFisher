@@ -11,12 +11,73 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
-        public static final int title_screen=0x7f020001;
+        public static final int cast=0x7f020000;
+        public static final int cast2=0x7f020001;
+        public static final int cast2_animation_32=0x7f020002;
+        public static final int cast2_animation_33=0x7f020003;
+        public static final int cast2_animation_34=0x7f020004;
+        public static final int cast2_animation_35=0x7f020005;
+        public static final int cast2_animation_36=0x7f020006;
+        public static final int cast2_animation_37=0x7f020007;
+        public static final int cast2_animation_38=0x7f020008;
+        public static final int cast2_animation_39=0x7f020009;
+        public static final int cast2_animation_40=0x7f02000a;
+        public static final int cast2_animation_41=0x7f02000b;
+        public static final int cast2_animation_42=0x7f02000c;
+        public static final int cast2_animation_43=0x7f02000d;
+        public static final int cast2_animation_44=0x7f02000e;
+        public static final int cast2_animation_45=0x7f02000f;
+        public static final int cast2_animation_46=0x7f020010;
+        public static final int cast2_animation_47=0x7f020011;
+        public static final int cast2_animation_48=0x7f020012;
+        public static final int cast2_animation_49=0x7f020013;
+        public static final int cast2_animation_50=0x7f020014;
+        public static final int cast2_animation_51=0x7f020015;
+        public static final int cast2_animation_52=0x7f020016;
+        public static final int cast2_animation_53=0x7f020017;
+        public static final int cast2_animation_54=0x7f020018;
+        public static final int cast2_animation_55=0x7f020019;
+        public static final int cast2_animation_56=0x7f02001a;
+        public static final int cast_animation_00=0x7f02001b;
+        public static final int cast_animation_01=0x7f02001c;
+        public static final int cast_animation_02=0x7f02001d;
+        public static final int cast_animation_03=0x7f02001e;
+        public static final int cast_animation_04=0x7f02001f;
+        public static final int cast_animation_05=0x7f020020;
+        public static final int cast_animation_06=0x7f020021;
+        public static final int cast_animation_07=0x7f020022;
+        public static final int cast_animation_08=0x7f020023;
+        public static final int cast_animation_09=0x7f020024;
+        public static final int cast_animation_10=0x7f020025;
+        public static final int cast_animation_11=0x7f020026;
+        public static final int cast_animation_12=0x7f020027;
+        public static final int cast_animation_13=0x7f020028;
+        public static final int cast_animation_14=0x7f020029;
+        public static final int cast_animation_15=0x7f02002a;
+        public static final int cast_animation_16=0x7f02002b;
+        public static final int cast_animation_17=0x7f02002c;
+        public static final int cast_animation_18=0x7f02002d;
+        public static final int cast_animation_19=0x7f02002e;
+        public static final int cast_animation_20=0x7f02002f;
+        public static final int cast_animation_21=0x7f020030;
+        public static final int cast_animation_22=0x7f020031;
+        public static final int cast_animation_23=0x7f020032;
+        public static final int cast_animation_24=0x7f020033;
+        public static final int cast_animation_25=0x7f020034;
+        public static final int cast_animation_26=0x7f020035;
+        public static final int cast_animation_27=0x7f020036;
+        public static final int cast_animation_28=0x7f020037;
+        public static final int cast_animation_29=0x7f020038;
+        public static final int cast_animation_30=0x7f020039;
+        public static final int cast_animation_31=0x7f02003a;
+        public static final int ic_launcher=0x7f02003b;
+        public static final int title_screen=0x7f02003c;
+        public static final int wheel=0x7f02003d;
     }
     public static final class id {
         public static final int mode_image=0x7f060002;
         public static final int title_image=0x7f060000;
+        public static final int travel_background=0x7f060003;
         public static final int viewpager=0x7f060001;
     }
     public static final class layout {

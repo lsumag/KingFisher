@@ -2,7 +2,9 @@ package org.MAG;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,10 +13,11 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 public class LevelSelection extends Activity implements SensorEventListener {
@@ -30,20 +33,45 @@ public class LevelSelection extends Activity implements SensorEventListener {
 	private static ImageView[] levelScreens = new ImageView[4];
 	private boolean[] levelsUnlocked = new boolean[4];
 	
+	private int selectedLevel;
+	
+	private SharedPreferences settings;
+	private SharedPreferences.Editor editor;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        //TODO: set the levelScreens up here.
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        
         //we need to keep up with what levels the user has unlocked.
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
-        for (int i = 0; i < levelScreens.length; i++) {
+        settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
+        editor = settings.edit();
+        editor.putInt("SelectedLevel", 0);
+        editor.commit();
+        
+        levelScreens[0] = new ImageView(this);
+        levelScreens[0].setBackgroundResource(R.drawable.cast2_animation_32);
+        levelsUnlocked[0] = true;
+        
+        for (int i = 1; i < levelScreens.length; i++) {
+        	levelScreens[i] = new ImageView(this);
         	levelsUnlocked[i] = settings.getBoolean("level"+i+1, false);
+        	
+        	//TODO: set backgrounds appropriately.
+        	
+        	if (levelsUnlocked[i]) 
+        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32);
+        	else
+        		levelScreens[i].setBackgroundResource(R.drawable.cast_animation_29);
         }
         
         setContentView(R.layout.level_selecter);
         pagerAdapter = new MyPagerAdapter();
         viewPager = (MyViewPager) findViewById(R.id.viewpager);
+        viewPager.init(this);
         viewPager.setAdapter(pagerAdapter);
         
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -73,9 +101,22 @@ public class LevelSelection extends Activity implements SensorEventListener {
         if ((totalForce < forceThreshHold) && (m_totalForcePrev > forceThreshHold)) {
         	Log.e("KingFisher", "SHAKE!");
         	
-        	vibrotron.vibrate(300);
-        	
-        	//TODO: launch next activity (travel) with current level selection.
+        	if (levelsUnlocked[selectedLevel]) {
+        		
+        		vibrotron.vibrate(300);
+        		try {
+                	Intent ourIntent = new Intent(LevelSelection.this, Class.forName("org.MAG.TravelScene"));
+                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        			startActivity(ourIntent);
+        			sensorManager.unregisterListener(this);
+        			finish();
+        		} catch (ClassNotFoundException ex) {
+        			Log.e("LEVELSELECTION", "Failed to jump to another activity");
+        		}
+        	}
+        	else {
+        		//TODO: if not available, vibrate no pattern.
+        	}
         }
         
         m_totalForcePrev = (float) totalForce;
@@ -95,31 +136,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
         }
 		
 		public Object instantiateItem(View collection, int position) {
-			 
-            LayoutInflater inflater = (LayoutInflater) collection.getContext()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
- 
-            int resId = 0;
-            switch (position) {
-            case 0:
-                //resId = R.layout.continental_content;
-                //screens.set(position, new Continent(this.owner));
-                break;
-            case 1:
-                //resId = R.layout.skype_layout;
-                //screens.set(position, new SkypeFeed(this.owner));
-                break;
-            default:
-            	//resId = R.layout.stuff;
-            	//screens.set(position, new TEIScreen(this.owner));
-                break; 
-            }
-            
-            //screen = screens.get(position);
-            View view = inflater.inflate(resId, null);
-            //screen.addView(view);
-            ((ViewPager) collection).addView(view, 0);
-            return view;
+			((ViewPager) collection).addView(levelScreens[position], 0);
+            return levelScreens[position];
         }
 
 		@Override
@@ -128,23 +146,12 @@ public class LevelSelection extends Activity implements SensorEventListener {
         }
 	}
 	
-	private static class MyViewPager extends ViewPager {
-		
-		public MyViewPager(Context context, AttributeSet attrs) {
-			super(context, attrs);
-			// TODO Auto-generated constructor stub
+	void updateContentStatus(int i) {
+		//TODO: we can rename this one and do our level description audio here. 
+		if (levelsUnlocked[i]) {
+			selectedLevel = i;
+			editor.putInt("SelectedLevel", i);
+			editor.commit();
 		}
-
-		@Override
-		public void onPageScrolled(int position, float offset, int offsetPixels) {
-			super.onPageScrolled(position, offset, offsetPixels);
-			updateContentStatus(position);
-		}
-		
-	}
-	
-	public static void updateContentStatus(int i) {
-		//TODO: we can rename this one and do our level description audio here.
-		
 	}
 }
