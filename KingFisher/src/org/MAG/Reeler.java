@@ -85,7 +85,6 @@ public class Reeler extends ImageView implements OnTouchListener {
 	
 	
 
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		event.offsetLocation(minusHalfWidth, minusHalfHeight); //offset - now relative to center
 		x = event.getX();

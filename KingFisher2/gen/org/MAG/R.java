@@ -15,8 +15,9 @@ public final class R {
         public static final int title_screen=0x7f020001;
     }
     public static final class id {
-        public static final int mode_image=0x7f060001;
+        public static final int mode_image=0x7f060002;
         public static final int title_image=0x7f060000;
+        public static final int viewpager=0x7f060001;
     }
     public static final class layout {
         public static final int caster=0x7f030000;

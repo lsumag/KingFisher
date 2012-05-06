@@ -39,7 +39,6 @@ public class Shaker extends ImageView implements SensorEventListener {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
-	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// so what?
 		
@@ -49,7 +48,6 @@ public class Shaker extends ImageView implements SensorEventListener {
 		sensorManager.unregisterListener(this);
 	}
 	
-	@Override
 	public void onSensorChanged(SensorEvent event) {		
 		double forceThreshHold = 2.5f;
         double totalForce = 0.0f;

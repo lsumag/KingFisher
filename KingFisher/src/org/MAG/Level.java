@@ -77,7 +77,6 @@ public class Level extends LinearLayout implements SensorEventListener {
 	        	setBackgroundResource(imgAdapt.getImg(position));
 	        }
 
-			@Override
 			public void onNothingSelected(AdapterView parent) {
 				// TODO Auto-generated method stub
 			}
@@ -86,12 +85,10 @@ public class Level extends LinearLayout implements SensorEventListener {
 		
 	}
 
-	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// 
 	}
 
-	@Override
 	public void onSensorChanged(SensorEvent event) {
 		double forceThreshHold = 2.5f;
         double totalForce = 0.0f;

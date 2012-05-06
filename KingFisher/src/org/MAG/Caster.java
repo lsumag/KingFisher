@@ -59,7 +59,6 @@ public class Caster extends ImageView implements OnTouchListener, SensorEventLis
 		return casted;
 	}
 	
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
 	    case MotionEvent.ACTION_DOWN:
@@ -75,12 +74,10 @@ public class Caster extends ImageView implements OnTouchListener, SensorEventLis
 		return true;
 	}
 
-	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// get out of my house		
 	}
 
-	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (touched) {
 			if (!casting) {

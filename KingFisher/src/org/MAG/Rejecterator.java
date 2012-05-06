@@ -42,12 +42,10 @@ public class Rejecterator extends ImageView implements SensorEventListener {
 		return rejectorated;
 	}
 	
-	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// Yeah, well, you know, that's just like, your opinion, man.
 	}
 
-	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (!rejectorated) {
 			if (event.values[1] < -SensorManager.GRAVITY_EARTH * 1.5 && (Math.abs(event.values[0]) > SensorManager.GRAVITY_EARTH * 1.5 || Math.abs(event.values[2]) > SensorManager.GRAVITY_EARTH * 1.5)) {

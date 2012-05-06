@@ -25,7 +25,6 @@ public class Intro extends ImageView implements OnTouchListener {
 		});
 	}
 
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		complete = true;
 		return true;

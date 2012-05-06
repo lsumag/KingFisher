@@ -31,7 +31,6 @@ public class Reeler extends Activity implements OnTouchListener {
 	//TODO: play failure audio
 	//TODO: go back to the caster activity
 	
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO this is where all positive progress happens. also check for catch here.
 		return false;

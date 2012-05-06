@@ -28,19 +28,16 @@ public class MainGameView extends SurfaceView implements SurfaceHolder.Callback{
 		return thread;
 	}
 	
-	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		thread.setRunning(true);
 		if (thread.isAlive() == false)
 			thread.start();
 	}
 
-	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		thread.exterminate();
 	}

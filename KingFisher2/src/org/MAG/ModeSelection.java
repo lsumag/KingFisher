@@ -1,7 +1,9 @@
 package org.MAG;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -28,14 +30,19 @@ public class ModeSelection extends Activity implements OnTouchListener {
 	}
 	
 	private void swipeLevel() {
-		//TODO: launch level selection
+		try {
+        	Intent ourIntent = new Intent(ModeSelection.this, Class.forName("org.MAG.LevelSelection"));
+			startActivity(ourIntent);
+
+		} catch (ClassNotFoundException ex) {
+			Log.e("MODE_SELECTION", "Failed to jump to another activity");
+		}
 	}
 
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		//TODO: detect left and right swipe gestures and then calls swipePractice() or swipeLevel()
 		
-		//for now
+		//for now, just load up the level selection. we're doing practice stuff later.
 		swipeLevel();
 		
 		return true;
