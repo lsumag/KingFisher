@@ -52,6 +52,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
         editor.putInt("SelectedLevel", 0);
         editor.commit();
         
+        SoundManager.loadSounds(SoundManager.LEVEL);
+        
         levelScreens[0] = new ImageView(this);
         levelScreens[0].setBackgroundResource(R.drawable.cast2_animation_32);
         levelsUnlocked[0] = true;
@@ -65,7 +67,7 @@ public class LevelSelection extends Activity implements SensorEventListener {
         	if (levelsUnlocked[i]) 
         		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32);
         	else
-        		levelScreens[i].setBackgroundResource(R.drawable.cast_animation_29);
+        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_56);
         }
         
         setContentView(R.layout.level_selecter);
@@ -101,7 +103,7 @@ public class LevelSelection extends Activity implements SensorEventListener {
         if ((totalForce < forceThreshHold) && (m_totalForcePrev > forceThreshHold)) {
         	Log.e("KingFisher", "SHAKE!");
         	
-        	if (levelsUnlocked[selectedLevel]) {
+        	if (levelsUnlocked[settings.getInt("SelectedLevel", 0)]) {
         		
         		vibrotron.vibrate(300);
         		try {
@@ -148,8 +150,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
 	
 	void updateContentStatus(int i) {
 		//TODO: we can rename this one and do our level description audio here. 
+		selectedLevel = i;
 		if (levelsUnlocked[i]) {
-			selectedLevel = i;
 			editor.putInt("SelectedLevel", i);
 			editor.commit();
 		}

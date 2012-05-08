@@ -2,6 +2,7 @@ package org.MAG;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 
 public class Caster extends Activity implements OnTouchListener, SensorEventListener {
 
@@ -26,6 +28,8 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private boolean casting;
 	private final long[] castPattern = {0, 50, 50, 50, 50, 50, 50, 50, 50};
 	
+	private ImageView casterBackground;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +40,16 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         
         setContentView(R.layout.caster);
         
+        casterBackground = (ImageView)findViewById(R.id.caster_background);
+        casterBackground.setOnTouchListener(this);
+        
+        
+        SoundManager.loadSounds(SoundManager.CASTABLE);
+        
         //TODO: instructional audio
         
         //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
-        
+        vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
@@ -62,6 +72,8 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
+	
+	//TODO: determine how good the cast is and save it in prefs.
 	public void onSensorChanged(SensorEvent event) {
 		if (touched) {
 			if (!casting) {
@@ -70,25 +82,25 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					casting = true;
 					vibrotron.vibrate(castPattern, -1);
 					
-					exterminate();
 					SoundManager.playSound(1, 1);
 					
 					//TODO: launch the cast animation, wait for it to finish. launch next activity. reeler.
-					
+					try {
+			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
+			        	sensorManager.unregisterListener(this);
+			        	vibrotron = null;
+			        	sensorManager = null;
+			        	casterBackground.setOnTouchListener(null);
+			        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(ourIntent);
+						finish();
+					} catch (ClassNotFoundException ex) {
+						Log.e("INTRO", "Failed to jump to another activity");
+					}
 					//Log.e("KingFisher", "X: "+ event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
 				}
 			}
 		}
 		else casting = false;
 	}
-	
-	public void exterminate() {
-		sensorManager.unregisterListener(this);
-		vibrotron = null;
-		sensorManager = null;
-	}
-	
-	//TODO: listen for the cast gesture, launch cast animation if touched.
-	
-	//TODO: once animation finishes, launch Reeler Activity
 }

@@ -1,27 +1,26 @@
 package org.MAG;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.VideoView;
 
-public class TravelScene extends Activity implements OnTouchListener {
+public class TravelScene extends Activity implements OnTouchListener, MediaPlayer.OnCompletionListener {
 
-	private ImageView travel;
-	private AnimationDrawable frameAnimation;
-	
-	private TimerTask timerTask;
+	private MyVideoView travel;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,33 +30,46 @@ public class TravelScene extends Activity implements OnTouchListener {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
-        setContentView(R.layout.travel); 
+		setContentView(R.layout.travel);
         
-        //TODO: travel audio
+        //TODO: travel audio.
+		
+		
+		//Display display = getWindowManager().getDefaultDisplay(); 
+		//int width = display.getWidth();  // deprecated
+		//int height = display.getHeight();
+		
+		
+		//TODO: make travel video full screen
+        travel = (MyVideoView)findViewById(R.id.travel_background);
+        //travel = new MyVideoView(this);
         
-        travel = (ImageView)findViewById(R.id.travel_background);
         travel.setOnTouchListener(this);
-        travel.setBackgroundResource(R.drawable.cast);
+        Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.travel);
+        travel.setVideoURI(video);
         
-        frameAnimation = (AnimationDrawable) travel.getBackground();
-        frameAnimation.start();
-        long totalDuration = 0;
-        for (int i = 0; i < frameAnimation.getNumberOfFrames(); i++) {
-        	totalDuration += frameAnimation.getDuration(i);
-        }
-        Timer timer = new Timer();
-        timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				frameAnimation.stop();
-				loadNextLevel();
-			}
-        };
-        timer.schedule(timerTask, totalDuration);
+        //RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
+        //travel.setLayoutParams(params);
+        
+        travel.setOnCompletionListener(this);
+        
+        //travel.changeVideoSize(width, height);
+        
+        
+        Display display = getWindowManager().getDefaultDisplay(); 
+        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(display.getWidth(),
+                MeasureSpec.UNSPECIFIED);
+        int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(display.getHeight(),
+                MeasureSpec.UNSPECIFIED);
+        travel.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+        
+        
+        travel.start();
+        
     }
 	
 	public boolean onTouch(View arg0, MotionEvent arg1) {
-		
+		Log.e("Travel", "touched");
 		loadNextLevel();
 		return true;
 	}
@@ -65,14 +77,19 @@ public class TravelScene extends Activity implements OnTouchListener {
 	private void loadNextLevel() {
 		Log.e("TravelScene", "finished. Loading Caster");
 		try {
+			travel.stopPlayback();
         	Intent ourIntent = new Intent(TravelScene.this, Class.forName("org.MAG.Caster"));
         	travel.setOnTouchListener(null);
-        	timerTask.cancel();
+        	travel.setOnCompletionListener(null);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(ourIntent);
 			finish();
 		} catch (ClassNotFoundException ex) {
 			Log.e("INTRO", "Failed to jump to another activity");
 		}
+	}
+
+	public void onCompletion(MediaPlayer arg0) {
+		loadNextLevel();
 	}
 }

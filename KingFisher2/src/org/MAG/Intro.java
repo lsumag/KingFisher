@@ -53,7 +53,10 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
 		}
 		
 		try {
-        	Intent ourIntent = new Intent(Intro.this, Class.forName("org.MAG.ModeSelection"));
+        	//Intent ourIntent = new Intent(Intro.this, Class.forName("org.MAG.ModeSelection"));
+        	//TODO: implement tutorial mode, THEN we'll go to mode selection. right now, just skip it.
+        	Intent ourIntent = new Intent(Intro.this, Class.forName("org.MAG.LevelSelection"));
+        	
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         	titleScreen.setOnTouchListener(null);
 			startActivity(ourIntent);

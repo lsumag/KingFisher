@@ -20,6 +20,10 @@ public class KingFisher2Activity extends Activity {
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.main);
+        
+        SoundManager.getInstance();
+        SoundManager.initSounds(getApplicationContext());
+        
         try {
         	Intent ourIntent = new Intent(KingFisher2Activity.this, Class.forName("org.MAG.Intro"));
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

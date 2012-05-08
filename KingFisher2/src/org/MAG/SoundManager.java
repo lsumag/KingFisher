@@ -19,20 +19,20 @@ public class SoundManager {
 	private static AudioManager  mAudioManager;
 	private static Context mContext;
 	
-	private static final int INTRO = 0; //intro screen
-	private static final int TITLE = 1; //title screen
-	private static final int TUTORIAL = 2; //tutorial
-	private static final int LEVEL = 3; //level selection screen
-	private static final int TRAVEL = 4; //en route to level
-	private static final int CASTABLE = 5; //casting screen
-	private static final int REELABLE = 6; //reeling screen
-	private static final int FAIL = 7; //king escaped splash
-	private static final int SUCCESS = 8; //caught the king
-	private static final int POUT = 9; //king looks stupid
-	private static final int SHAKABLE = 10; //take his lunch money
-	private static final int FLINGABLE = 11; //throw him in the river!
-	private static final int ACHIEVEMENT = 12; //the loot
-	private static final int VICTORY = 13; //YAY, YOU WIN!
+	public static final int INTRO = 0; //intro screen
+	public static final int TITLE = 1; //title screen
+	public static final int TUTORIAL = 2; //tutorial
+	public static final int LEVEL = 3; //level selection screen
+	public static final int TRAVEL = 4; //en route to level
+	public static final int CASTABLE = 5; //casting screen
+	public static final int REELABLE = 6; //reeling screen
+	public static final int FAIL = 7; //king escaped splash
+	public static final int SUCCESS = 8; //caught the king
+	public static final int POUT = 9; //king looks stupid
+	public static final int SHAKABLE = 10; //take his lunch money
+	public static final int FLINGABLE = 11; //throw him in the river!
+	public static final int ACHIEVEMENT = 12; //the loot
+	public static final int VICTORY = 13; //YAY, YOU WIN!
 	
 	
 	private SoundManager()

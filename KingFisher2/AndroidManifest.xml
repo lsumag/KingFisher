@@ -22,7 +22,7 @@
         <activity android:label="@string/app_name" android:name=".ModeSelection" android:noHistory="true" />
         <activity android:label="@string/app_name" android:name=".LevelSelection" android:noHistory="true" />
         <activity android:label="@string/app_name" android:name=".TravelScene" android:noHistory="true" />
-        <activity android:label="@string/app_name" android:name=".Caster" android:noHistory="true" />
+        <activity android:label="@string/app_name" android:name=".Caster" android:noHistory="true" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:label="@string/app_name" android:name=".Reeler" android:noHistory="true" />
         <activity android:label="@string/app_name" android:name=".Shaker" android:noHistory="true" />
         <activity android:label="@string/app_name" android:name=".Rejecterator" android:noHistory="true" />
