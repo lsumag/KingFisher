@@ -34,10 +34,7 @@ public class SoundManager {
 	public static final int ACHIEVEMENT = 12; //the loot
 	public static final int VICTORY = 13; //YAY, YOU WIN!
 	
-	
-	private SoundManager()
-	{   
-	}
+	private SoundManager() { }
 	
 	/**
 	 * Requests the instance of the Sound Manager and creates it
@@ -52,7 +49,7 @@ public class SoundManager {
 	    return _instance;
 	 }
 	
-	/**
+	/** TODO: do we need all of these different pools? we could just have one big hashmap for everything
 	 * Initializes the storage for the sounds
 	 * 
 	 * @param theContext The Application context
@@ -81,7 +78,7 @@ public class SoundManager {
 		mSoundPoolMap.put(Index, mSoundPool.load(mContext, SoundID, 1));
 	}
 	
-	/**
+	/** TODO: run through each state, make sure we're loading the right sounds, get more audio assets from Nick et al
 	 * Loads the various sound assets
 	 * @param: state - game state
 	 */
@@ -136,7 +133,7 @@ public class SoundManager {
 		}
 	}
 	
-	/**
+	/** TODO: we will only need playSound after the above TODOs are completed. remove the others.
 	 * Plays a Sound
 	 * 
 	 * @param index - The Index of the Sound to be played
@@ -190,6 +187,9 @@ public class SoundManager {
 		mSoundPool.stop(mSoundPoolMap.get(index));
 	}
 	
+	/**
+	 * Release sound assets, clear the hashmap, unload the audio manager, destroy the static instance
+	 */
 	public static void cleanup()
 	{
 		if (!(mSoundPool == null))

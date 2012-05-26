@@ -18,6 +18,11 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
 	private ImageView titleScreen;
 	private MediaPlayer mediaPlayer;
 	
+	/**
+	 * Called when this activity begins. set the window up, get a media player for an intro video, set a touch listener, listen for media completion
+	 * 
+	 * @param savedInstanceState
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,15 +41,29 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
         titleScreen.setOnTouchListener(this);
     }
 	
-	public boolean onTouch(View arg0, MotionEvent arg1) {
+	/**
+	 * Called when the titleScreen receives a touch. it should be the only view listening.
+	 * 
+	 * @param v the view that has been touched. Should be titleScreen.
+	 * @param event the event that has occurred. Doesn't matter - load the next level.
+	 */
+	public boolean onTouch(View v, MotionEvent event) {
 		loadNextLevel();
 		return true;
 	}
 
+	/**
+	 * The media player has completed playback. load the next level
+	 * 
+	 * @param the media player that has finished
+	 */
 	public void onCompletion(MediaPlayer mP) {
 		loadNextLevel();
 	}
 	
+	/**
+	 * Release the media player and its assets, load up the next activity
+	 */
 	private void loadNextLevel() {
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();
@@ -66,6 +85,9 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
 		}
 	}
 	
+	/**
+	 * We are exiting the app. release the media player and its assets.
+	 */
 	public void onDestroy() {
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();

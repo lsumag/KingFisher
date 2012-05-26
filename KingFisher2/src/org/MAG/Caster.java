@@ -30,6 +30,11 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	
 	private ImageView casterBackground;
 	
+	/**
+	 * Initiate the Caster Activity, load the sounds up, set up touch listener, vibrator, sensor manager, and accelerometer sensor
+	 * 
+	 * @param savedInstanceState
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +60,13 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+	/**
+	 * Listener called when the screen is touched. Only the casterBackground should be using this listener.
+	 * Down events allow the user to cast, Up events prevent it.
+	 * 
+	 * @param v the View that has been touched. this should only be casterBackground!
+	 * @param event the MotionEvent that has occurred. 
+	 */
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
 	    case MotionEvent.ACTION_DOWN:
@@ -70,21 +82,37 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		return true;
 	}
 
+	/**
+	 * Sensor accuracy has changed. We don't need to worry about this.
+	 * 
+	 * @param sensor the sensor that has been affected. Should be accelerometer
+	 * @param accuracy the new accuracy setting for that sensor
+	 */
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
 	
-	//TODO: determine how good the cast is and save it in prefs.
+	/** TODO: determine how good the cast is and save it in prefs.
+	 * Called when a sensor gets a read. This will happen a LOT. Determine if the user has casted the rod here.
+	 * 
+	 * @param event the event that we received from hardware. use event.values to find x, y, and z readings. note: this is also just the accelerometer
+	 */
 	public void onSensorChanged(SensorEvent event) {
+		//If the user's finger is on the screen and we're not already casting...
 		if (touched) {
 			if (!casting) {
+				//if the readings are strong enough over the right axes (x and y)...
 				if (event.values[1] < -SensorManager.GRAVITY_EARTH * 1.5 && (Math.abs(event.values[0]) > SensorManager.GRAVITY_EARTH || Math.abs(event.values[2]) > SensorManager.GRAVITY_EARTH)) {
+					//CAST!!!
 					Log.e("KingFisher", "CAST!!!");
 					casting = true;
 					vibrotron.vibrate(castPattern, -1);
 					
+					//play the casting audio.
 					SoundManager.playSound(1, 1);
 					
 					//TODO: launch the cast animation, wait for it to finish. launch next activity. reeler.
+					
+					//Free up listeners, hardware, etc. and launch the Reeler Activity.
 					try {
 			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
 			        	sensorManager.unregisterListener(this);
@@ -97,7 +125,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					} catch (ClassNotFoundException ex) {
 						Log.e("INTRO", "Failed to jump to another activity");
 					}
-					//Log.e("KingFisher", "X: "+ event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
 				}
 			}
 		}

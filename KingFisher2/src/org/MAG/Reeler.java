@@ -10,18 +10,28 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
+/**
+ * 
+ * @author UnderGear
+ *
+ */
 public class Reeler extends Activity implements OnTouchListener {
 
 	private ImageView reelerBackground;
 	private SurfaceView foreground;
 	private Vibrator vibrotron;
 	
+	/**
+	 * Called on Activity creation. Set the background, touch listener, vibrator, load up sounds.
+	 * 
+	 * @param savedInstanceState
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.reeler); 
         
-        reelerBackground = (ImageView)findViewById(R.id.caster_background);
+        reelerBackground = (ImageView)findViewById(R.id.reeler_background);
         reelerBackground.setOnTouchListener(this);
         
         SoundManager.loadSounds(SoundManager.REELABLE);

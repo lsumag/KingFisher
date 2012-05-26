@@ -12,10 +12,20 @@ import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
+/**
+ * 
+ * @author UnderGear
+ *
+ */
 public class ModeSelection extends Activity implements OnTouchListener {
 
 	private ImageView img;
 	
+	/**
+	 * Called on activity create. set up the touch listener.
+	 * 
+	 * @param savedInstanceState
+	 */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
