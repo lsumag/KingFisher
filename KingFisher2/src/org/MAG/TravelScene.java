@@ -57,7 +57,7 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 		//int height = display.getHeight();
 		
 		
-		//TODO: make travel video full screen
+		//TODO: make travel video full screen. what is with this layout right now? could it be the video itself?
         travel = (SurfaceView)findViewById(R.id.travel_background);
         //travel = new MyVideoView(this);
         

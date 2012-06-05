@@ -20,6 +20,8 @@ import android.widget.ImageView;
 
 public class Caster extends Activity implements OnTouchListener, SensorEventListener {
 
+	private static final String TAG = "Caster";
+	
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -29,6 +31,10 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private final long[] castPattern = {0, 50, 50, 50, 50, 50, 50, 50, 50};
 	
 	private ImageView casterBackground;
+	
+	private int castDistance;
+	
+	//TODO: we need a way to keep track of the quality of the cast.
 	
 	/**
 	 * Initiate the Caster Activity, load the sounds up, set up touch listener, vibrator, sensor manager, and accelerometer sensor
@@ -91,7 +97,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
 	
-	/** TODO: determine how good the cast is and save it in prefs.
+	/** TODO: wait for the cast gesture to finish before deciding on a castDistance value to send.
 	 * Called when a sensor gets a read. This will happen a LOT. Determine if the user has casted the rod here.
 	 * 
 	 * @param event the event that we received from hardware. use event.values to find x, y, and z readings. note: this is also just the accelerometer
@@ -115,6 +121,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					//Free up listeners, hardware, etc. and launch the Reeler Activity.
 					try {
 			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
+			        	ourIntent.putExtra("CastDistance", castDistance);
 			        	sensorManager.unregisterListener(this);
 			        	vibrotron = null;
 			        	sensorManager = null;
@@ -123,7 +130,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 						startActivity(ourIntent);
 						finish();
 					} catch (ClassNotFoundException ex) {
-						Log.e("INTRO", "Failed to jump to another activity");
+						Log.e(TAG, "Failed to jump to another activity");
 					}
 				}
 			}

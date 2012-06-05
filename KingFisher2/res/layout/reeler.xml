@@ -6,6 +6,6 @@
     
 	<ImageView android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:src="@drawable/cast2_animation_44"
-    android:id="@+id/reeler_background"/>
+    android:id="@+id/reeler_background"
+    android:background="@drawable/cast2_animation_44"/>
 </FrameLayout>

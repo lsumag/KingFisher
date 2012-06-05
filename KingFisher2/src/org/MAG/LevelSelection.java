@@ -99,9 +99,6 @@ public class LevelSelection extends Activity implements SensorEventListener {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         
         //TODO: launch instructional audio thread
-        
-        //TODO: maybe play audio when a level is focused for a certain amount of time
-        //maybe vibrate as each one comes into focus.
     }
 
 	/**
@@ -148,7 +145,7 @@ public class LevelSelection extends Activity implements SensorEventListener {
         	}
         	//The selected level is not unlocked.
         	else {
-        		//TODO: if not available, vibrate no pattern.
+        		//TODO: if not available, vibrate "no" pattern. two buzzes in quick succession?
         	}
         }
         
@@ -192,7 +189,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
 	 * @param i
 	 */
 	void updateContentStatus(int i) {
-		//TODO: we can rename this method and do our level description audio here.
+		//TODO: we can rename this method and do our level description audio here. launch an asynctask to wait and then play the level description.
+		//we can do a little buzz when we switch into focus, too.
 		if (levelsUnlocked[i]) {
 			editor.putInt("SelectedLevel", i);
 			editor.commit();
