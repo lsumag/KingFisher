@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,8 +25,10 @@ import android.widget.ImageView;
  * @author UnderGear
  *
  */
-public class LevelSelection extends Activity implements SensorEventListener {
+public class LevelSelection extends Activity implements SensorEventListener, OnPageChangeListener {
 
+	private static final String TAG = "LevelSelection";
+	
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -96,8 +99,9 @@ public class LevelSelection extends Activity implements SensorEventListener {
         setContentView(R.layout.level_selecter);
         pagerAdapter = new MyPagerAdapter();
         viewPager = (MyViewPager) findViewById(R.id.viewpager);
-        viewPager.init(this);
         viewPager.setAdapter(pagerAdapter);
+        
+        viewPager.setOnPageChangeListener(this);
         
         //Setting up sensors, vibrator, listeners.
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -188,19 +192,15 @@ public class LevelSelection extends Activity implements SensorEventListener {
             return arg0 == ((View) arg1);
         }
 	}
-	
-	/**
-	 * This should be called when a page is selected in the horizontal pager.
-	 * It sets the selected level to the index of the page selected and puts that into the preferences.
-	 * 
-	 * @param i
-	 */
-	void updateContentStatus(int i) {
-		//TODO: we can rename this method and do our level description audio here. launch an asynctask to wait and then play the level description.
-		//we can do a little buzz when we switch into focus, too.
-		//if (levelsUnlocked[i]) {
-			editor.putInt("SelectedLevel", i);
-			editor.commit();
-		//}
+
+	public void onPageScrollStateChanged(int state) { }
+
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+	public void onPageSelected(int position) {
+		Log.d(TAG, ""+position);
+		
+		editor.putInt("SelectedLevel", position);
+		editor.commit();
 	}
 }
