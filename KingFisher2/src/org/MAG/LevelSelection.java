@@ -191,9 +191,9 @@ public class LevelSelection extends Activity implements SensorEventListener {
 	void updateContentStatus(int i) {
 		//TODO: we can rename this method and do our level description audio here. launch an asynctask to wait and then play the level description.
 		//we can do a little buzz when we switch into focus, too.
-		if (levelsUnlocked[i]) {
+		//if (levelsUnlocked[i]) {
 			editor.putInt("SelectedLevel", i);
 			editor.commit();
-		}
+		//}
 	}
 }

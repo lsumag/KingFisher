@@ -30,7 +30,7 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 	
 	private SurfaceView travel;
 	private SurfaceHolder holder;
-	private MediaPlayer mP;
+	private MediaPlayer mediaPlayer;
 	
 	private boolean knownSize, sourceReady;
 	
@@ -69,14 +69,14 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
         holder.addCallback(this);
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         
-        mP = new MediaPlayer();
+        mediaPlayer = new MediaPlayer();
         try {
-			mP.setDataSource(getApplicationContext(), video);
+			mediaPlayer.setDataSource(getApplicationContext(), video);
 			
-			mP.setOnPreparedListener(this);
-			mP.setOnVideoSizeChangedListener(this);
+			mediaPlayer.setOnPreparedListener(this);
+			mediaPlayer.setOnVideoSizeChangedListener(this);
 			
-            mP.setOnCompletionListener(this);
+            mediaPlayer.setOnCompletionListener(this);
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, e.getMessage());
 		} catch (SecurityException e) {
@@ -108,6 +108,19 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
     }
 	
 	/**
+	 * We are exiting the app. release the media player and its assets.
+	 */
+	public void onDestroy() {
+		if (mediaPlayer != null) {
+			mediaPlayer.stop();
+			mediaPlayer.release();
+			mediaPlayer = null;
+		}
+		super.onDestroy();
+	}
+	
+	
+	/**
 	 * Called when the screen is touched. Loads the next level.
 	 * 
 	 * @param v view that received the touch
@@ -124,10 +137,10 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 	private void loadNextLevel() {
 		Log.e(TAG, "finished. Loading Caster");
 		try {
-			mP.stop();
+			mediaPlayer.stop();
         	Intent ourIntent = new Intent(TravelScene.this, Class.forName("org.MAG.Caster"));
         	travel.setOnTouchListener(null);
-        	mP.setOnCompletionListener(null);
+        	mediaPlayer.setOnCompletionListener(null);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(ourIntent);
 			finish();
@@ -149,8 +162,8 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 
 	public void surfaceCreated(SurfaceHolder arg0) {
 		try {
-			mP.setDisplay(holder);
-			mP.prepare();
+			mediaPlayer.setDisplay(holder);
+			mediaPlayer.prepare();
 		} catch (IllegalStateException e) { 
 			Log.e(TAG, e.getMessage());
 		} catch (IOException e) {
@@ -194,6 +207,6 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 		//Log.d("travel video", "setting size, playing");
 		//holder.setFixedSize(getWindow().getWindowManager().getDefaultDisplay().getWidth(), getWindow().getWindowManager().getDefaultDisplay().getHeight());
 		holder.setSizeFromLayout();
-		mP.start();
+		mediaPlayer.start();
 	}
 }

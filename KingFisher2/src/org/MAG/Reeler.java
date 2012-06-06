@@ -39,27 +39,15 @@ public class Reeler extends Activity implements OnTouchListener {
 	
 	private static final DisplayMetrics metrics = new DisplayMetrics();
 	private int minusHalfWidth, minusHalfHeight;
-	private MotionEvent currentMotion;
 	
+	private boolean fingerDown;
 	private float currentTheta;
 	private float currentRadius;
 	private float previousTheta;
 	private float previousRadius;
 	private float x, y;
 	private float angularDelta;
-	private float angularDistance;
-	private float angularVelocity;
-	private float[] velocities = {1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f};
-	private int velCount;
-	private float vListSum;
-	private float averageVelocity;
-	private float timeDelta;
-	private float dispatchTimer;
-	private int play = 1;
-	private int cap = 1;
-	private int distance, lineStrength; //TODO: set these onCreate based on the line you have and the quality of the cast.
-	
-	private long oldTouchEventTime, newTouchEventTime;
+	private float distance, lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast.
 	
 	/**
 	 * Called on Activity creation. Set the background, touch listener, vibrator, load up sounds.
@@ -107,6 +95,7 @@ public class Reeler extends Activity implements OnTouchListener {
 	 * We've waited and hooked something! Allow the player to start reeling in and have the fish/king struggle
 	 */
 	private void hook() {
+		Log.e(TAG, "HOOK!");
 		//TODO: determine what it is we've hooked based on random numbers and distance.
 		reelerBackground.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
@@ -116,9 +105,16 @@ public class Reeler extends Activity implements OnTouchListener {
 	private void success() {
 		//TODO: launch the shaker activity.
 		if (struggleTask != null) struggleTask.cancel(true);
+		Log.e(TAG, "SUCCESS!");
+		reelerBackground.setOnTouchListener(null);
 	}
 	
 	private void recast() {
+		
+		Log.e(TAG, "RECAST!");
+		
+		reelerBackground.setOnTouchListener(null);
+		
 		try {
         	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Caster"));
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -177,6 +173,8 @@ public class Reeler extends Activity implements OnTouchListener {
 				}
 				//TODO: fish line break attempt. damage the line based on level difficulty
 				
+				if (!fingerDown) distance += 5; //TODO: depends upon what's hooked as well. you should hold down to prevent the fish from unreeling itself.
+				
 				if (lineStrength <= 0) return true;
 			}
 		}
@@ -195,60 +193,47 @@ public class Reeler extends Activity implements OnTouchListener {
 	}
 	
 	public boolean onTouch(View v, MotionEvent event) {
-		// TODO this is where all positive progress happens. also check for catch here.
-		event.offsetLocation(minusHalfWidth, minusHalfHeight); //offset - now relative to center
+		event.offsetLocation(minusHalfWidth, minusHalfHeight); //offset our touch location. it is now relative to the center of the screen.
 		x = event.getX(0);
 		y = event.getY(0);
 		
-		
-		
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_DOWN: //Touch down. 
+		case MotionEvent.ACTION_DOWN:
 			
-			previousRadius = (float) Math.sqrt( x * x + y * y );
-			previousTheta = (float) Math.acos( x / previousRadius );
+			previousRadius = (float) Math.sqrt( x * x + y * y ); //Euclidean distance of touch from center of screen
+			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
+			
+			fingerDown = true;
 			
 			Log.d(TAG, "finger down.");
-			currentMotion = event;
-			
-			oldTouchEventTime = event.getEventTime();
 			
 			break;
 		case MotionEvent.ACTION_MOVE:
 			
-			//TODO: toss the time element from here. let's just remove the delta from the fish distance as we reel. fishDistance -= (currentTheta - previousTheta)/(Math.PI*100) or something like that.
+			//TODO: let's just remove the delta from the fish distance as we reel. fishDistance -= (currentTheta - previousTheta)/(Math.PI*100) or something like that.
 			
-			newTouchEventTime = event.getEventTime();
 			
 			currentRadius = (float) Math.sqrt( x * x + y * y ); //distance of the touch from center of the screen
 			currentTheta = (float) Math.acos( x / currentRadius ); //angle in radians.
 			
 			angularDelta = Math.abs(currentTheta - previousTheta); //find the angular change in radians from last update
 			
-			timeDelta = newTouchEventTime - oldTouchEventTime; //time between old reading and new one.
-			
-			angularDistance = angularDistance + angularDelta;
-			angularVelocity = (float) ((angularDelta / timeDelta) * 1E3 / Math.PI);
-			
-			Log.e(TAG, "time delta: " + timeDelta + ", angular distance: " + angularDistance + ", angular velocity: " + angularVelocity);
+			Log.e(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
 		
+			
+			
+			distance -= angularDelta;
+			//if (distance <= 0) success();
+			
 			//updating these for next cycle through.
 			previousTheta = currentTheta; 
 			previousRadius = currentRadius;
-			oldTouchEventTime = newTouchEventTime;
-			
-			if (distance <= 0) success();
-			
 			break;
 		case MotionEvent.ACTION_UP:
-			
-			angularDistance = 0;
-			
+			fingerDown = false;
 			Log.d(TAG, "finger up.");
 			break;
-			
 		}
-		
 		return true;
 	}
 }
