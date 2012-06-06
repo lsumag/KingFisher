@@ -37,8 +37,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
 	private MyViewPager viewPager;
 	private MyPagerAdapter pagerAdapter;
 	
-	private static ImageView[] levelScreens = new ImageView[4];
-	private boolean[] levelsUnlocked = new boolean[4];
+	private static ImageView[] levelScreens = new ImageView[4]; //TODO: we will have 3 images for each level. Locked screen, black silhouette, colored-in king. these correspond to locked levels, unlocked uncompleted levels, and completed levels
+	private int[] levelStatus = new int[levelScreens.length];
 	
 	private SharedPreferences settings;
 	private SharedPreferences.Editor editor;
@@ -63,8 +63,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
         
         //Level 0 is always unlocked and selected.
         levelScreens[0] = new ImageView(this);
-        levelScreens[0].setBackgroundResource(R.drawable.cast2_animation_32); //placeholder background.
-        levelsUnlocked[0] = true;
+        levelScreens[0].setBackgroundResource(R.drawable.napoleon_level); //Napoleon silhouette
+        levelStatus[0] = 1;
         
         //Level lock/unlocked statuses are kept in preferences.
         settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
@@ -75,14 +75,21 @@ public class LevelSelection extends Activity implements SensorEventListener {
         //Determine which levels are unlocked. Each should have a corresponding locked vs unlocked background that we are setting here.
         for (int i = 1; i < levelScreens.length; i++) {
         	levelScreens[i] = new ImageView(this);
-        	levelsUnlocked[i] = settings.getBoolean("level"+i+1, false);
+        	levelStatus[i] = settings.getInt("level"+i+1, 0);
         	
         	//Set background.
-        	//TODO: look up correct backgrounds. we should probably do this with 2 arrays and just look up the right thing by index.
-        	if (levelsUnlocked[i]) 
-        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32); //unlockedBackgrounds[i]
-        	else
+        	//TODO: look up correct backgrounds. we should probably do this with 3 arrays and just look up the right thing by index.
+        	switch (levelStatus[i]) {
+        	case 0:
         		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_56); //lockedBackgrounds[i]
+        		break;
+        	case 1:
+        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32); //unlockedBackgrounds[i]
+        		break;
+        	case 2:
+        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32); //completedBackgrounds[i]
+        		break;
+        	}
         }
         
         //Setting up horizontal paging here.
@@ -128,8 +135,8 @@ public class LevelSelection extends Activity implements SensorEventListener {
         if ((totalAcceleration < accelerationThreshold) && (totalPreviousAcceleration > accelerationThreshold)) {
         	Log.e("KingFisher", "SHAKE!");
         	
-        	//Launch the selected level only if it is unlocked.
-        	if (levelsUnlocked[settings.getInt("SelectedLevel", 0)]) {
+        	//Launch the selected level only if it is unlocked. greater than 0 is unlocked.
+        	if (levelStatus[settings.getInt("SelectedLevel", 0)] > 0) {
         		
         		vibrotron.vibrate(300); //TODO: we should create a pattern to vibrate on level selection.
         		//Launch the next Activity - TravelScene
