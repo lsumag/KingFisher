@@ -97,8 +97,10 @@ public final class R {
         public static final int caster_background=0x7f060000;
         public static final int mode_image=0x7f060003;
         public static final int reeler_background=0x7f060004;
+        public static final int rejecterator_background=0x7f060005;
+        public static final int shaker_background=0x7f060006;
         public static final int title_image=0x7f060001;
-        public static final int travel_background=0x7f060005;
+        public static final int travel_background=0x7f060007;
         public static final int viewpager=0x7f060002;
     }
     public static final class layout {
@@ -108,7 +110,9 @@ public final class R {
         public static final int main=0x7f030003;
         public static final int mode_selecter=0x7f030004;
         public static final int reeler=0x7f030005;
-        public static final int travel=0x7f030006;
+        public static final int rejecterator=0x7f030006;
+        public static final int shaker=0x7f030007;
+        public static final int travel=0x7f030008;
     }
     public static final class raw {
         public static final int ah=0x7f040000;

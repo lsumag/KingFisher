@@ -47,8 +47,8 @@ public class Reeler extends Activity implements OnTouchListener {
 	private float previousRadius;
 	private float x, y;
 	private float angularDelta;
-	private float distance, lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast.
-	
+	private float distance, lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast. we should have something about your hook and rod, too.
+	private int levelID, catchID;
 	/**
 	 * Called on Activity creation. Set the background, touch listener, vibrator, load up sounds.
 	 * 
@@ -61,6 +61,8 @@ public class Reeler extends Activity implements OnTouchListener {
         Bundle extras = getIntent().getExtras(); 
         if(extras !=null) {
             distance = extras.getInt("CastDistance");
+            levelID = extras.getInt("SelectedSelected");
+            Log.d(TAG, "Selected Level ID: " + levelID + ", Cast Distance: " + distance);
         }
         
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -103,10 +105,25 @@ public class Reeler extends Activity implements OnTouchListener {
 	}
 	
 	private void success() {
-		//TODO: launch the shaker activity.
+		
 		if (struggleTask != null) struggleTask.cancel(true);
 		Log.e(TAG, "SUCCESS!");
 		reelerBackground.setOnTouchListener(null);
+		
+		//TODO: we're going to launch the next activity based on what was caught. if it was junk, rejecterator. if it was a king, shaker.
+		//TODO: bundle up the catch's ID and ship it off to the next intent.
+		//TODO: if we caught a king, launch the shaker activity.
+		
+		try {
+        	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Shaker"));
+        	ourIntent.putExtra("CatchID", catchID);
+        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(ourIntent);
+			finish();
+		} catch (ClassNotFoundException ex) {
+			Log.e(TAG, "Failed to jump to another activity");
+		}
+		
 	}
 	
 	private void recast() {
@@ -117,6 +134,7 @@ public class Reeler extends Activity implements OnTouchListener {
 		
 		try {
         	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Caster"));
+        	ourIntent.putExtra("SelectedLevel", levelID);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(ourIntent);
 			finish();
@@ -223,7 +241,7 @@ public class Reeler extends Activity implements OnTouchListener {
 			
 			
 			distance -= angularDelta;
-			//if (distance <= 0) success();
+			if (distance <= 0) success();
 			
 			//updating these for next cycle through.
 			previousTheta = currentTheta; 

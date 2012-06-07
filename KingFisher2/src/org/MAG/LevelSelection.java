@@ -44,7 +44,8 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	private int[] levelStatus = new int[levelScreens.length];
 	
 	private SharedPreferences settings;
-	private SharedPreferences.Editor editor;
+	
+	private int selectedLevel;
 	
 	/**
 	 * Called at activity start. Grab our preferences for selected level, load up sounds from the manager, populate a horizontal pager with level selections
@@ -71,9 +72,6 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         
         //Level lock/unlocked statuses are kept in preferences.
         settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
-        editor = settings.edit();
-        editor.putInt("SelectedLevel", 0); //select level 0 to begin with.
-        editor.commit();
         
         //Determine which levels are unlocked. Each should have a corresponding locked vs unlocked background that we are setting here.
         for (int i = 1; i < levelScreens.length; i++) {
@@ -107,10 +105,21 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         
         //TODO: launch instructional audio thread
     }
+	
+	@Override
+	public void onPause() {
+		if (sensorManager != null) sensorManager.unregisterListener(this);
+		super.onPause();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+	}
 
 	/**
 	 * Sensor accuracy has changed. This is accelerometer
@@ -140,12 +149,14 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         	Log.e("KingFisher", "SHAKE!");
         	
         	//Launch the selected level only if it is unlocked. greater than 0 is unlocked.
-        	if (levelStatus[settings.getInt("SelectedLevel", 0)] > 0) {
+        	if (levelStatus[selectedLevel] > 0) {
         		
         		vibrotron.vibrate(300); //TODO: we should create a pattern to vibrate on level selection.
         		//Launch the next Activity - TravelScene
         		try {
                 	Intent ourIntent = new Intent(LevelSelection.this, Class.forName("org.MAG.TravelScene"));
+                	ourIntent.putExtra("SelectedLevel", selectedLevel);
+                	
                 	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         			startActivity(ourIntent);
         			sensorManager.unregisterListener(this);
@@ -200,7 +211,6 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	public void onPageSelected(int position) {
 		Log.d(TAG, ""+position);
 		
-		editor.putInt("SelectedLevel", position);
-		editor.commit();
+		selectedLevel = position;
 	}
 }

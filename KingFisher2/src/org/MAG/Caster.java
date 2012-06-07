@@ -32,6 +32,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	
 	private ImageView casterBackground;
 	
+	private int levelID;
 	private int castDistance;
 	
 	//TODO: we need a way to keep track of the quality of the cast.
@@ -44,6 +45,12 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        Bundle extras = getIntent().getExtras(); 
+        if(extras !=null) {
+            levelID = extras.getInt("SelectedLevel");
+            Log.d(TAG, "Selected Level ID: " + levelID);
+        }
         
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -63,8 +70,20 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
+	
+	@Override
+	public void onPause() {
+		if (sensorManager != null) sensorManager.unregisterListener(this);
+		super.onPause();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+	}
+	
 
 	/**
 	 * Listener called when the screen is touched. Only the casterBackground should be using this listener.
@@ -116,11 +135,12 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					//play the casting audio.
 					SoundManager.playSound(1, 1);
 					
-					//TODO: launch the cast animation, wait for it to finish. launch next activity. reeler.
+					//TODO: launch the cast animation, wait for it to finish before doing the following try block
 					
 					//Free up listeners, hardware, etc. and launch the Reeler Activity.
 					try {
 			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
+			        	ourIntent.putExtra("SelectedLevel", levelID);
 			        	ourIntent.putExtra("CastDistance", castDistance);
 			        	sensorManager.unregisterListener(this);
 			        	vibrotron = null;

@@ -34,6 +34,8 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 	
 	private boolean knownSize, sourceReady;
 	
+	private int levelID;
+	
 	/**
 	 * Called on Activity creation. set the background and video, media player and completion listener
 	 * 
@@ -49,7 +51,13 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
         
 		setContentView(R.layout.travel);
         
-        //TODO: travel audio.
+		Bundle extras = getIntent().getExtras(); 
+        if(extras !=null) {
+            levelID = extras.getInt("SelectedLevel");
+            Log.d(TAG, "Selected Level ID: " + levelID);
+        }
+		
+        //TODO: travel audio. we should probably just redo the video and toss in an audio track at the same time.
 		
 		
 		//Display display = getWindowManager().getDefaultDisplay(); 
@@ -139,6 +147,7 @@ public class TravelScene extends Activity implements OnTouchListener, MediaPlaye
 		try {
 			mediaPlayer.stop();
         	Intent ourIntent = new Intent(TravelScene.this, Class.forName("org.MAG.Caster"));
+        	ourIntent.putExtra("SelectedLevel", levelID);
         	travel.setOnTouchListener(null);
         	mediaPlayer.setOnCompletionListener(null);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
