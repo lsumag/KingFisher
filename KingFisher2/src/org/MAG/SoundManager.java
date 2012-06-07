@@ -10,12 +10,7 @@ public class SoundManager {
 	
 	static private SoundManager _instance;
 	private static SoundPool mSoundPool; 
-	private static HashMap<Integer, Integer> mSoundPoolMap; 
-	private static HashMap<Integer, Integer> mSoundPoolClick; 
-	private static HashMap<Integer, Integer> mSoundPoolCoins; 
-	private static HashMap<Integer, Integer> mKingSayings; 
-	private static HashMap<Integer, Integer> mJesterSayings; 
-	private static HashMap<Integer, Integer> mSoundSplash;
+	private static HashMap<Integer, Integer> mSoundPoolMap;
 	private static AudioManager  mAudioManager;
 	private static Context mContext;
 	
@@ -49,7 +44,7 @@ public class SoundManager {
 	    return _instance;
 	 }
 	
-	/** TODO: do we need all of these different pools? we could just have one big hashmap for everything
+	/**
 	 * Initializes the storage for the sounds
 	 * 
 	 * @param theContext The Application context
@@ -58,12 +53,7 @@ public class SoundManager {
 	{ 
 		 mContext = theContext;
 	     mSoundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
-	     mSoundPoolMap = new HashMap<Integer, Integer>(); 
-	     mSoundPoolClick = new HashMap<Integer, Integer>();
-	     mSoundPoolCoins = new HashMap<Integer, Integer>(); 
-	     mKingSayings = new HashMap<Integer, Integer>();
-	     mJesterSayings = new HashMap<Integer, Integer>();
-	     mSoundSplash = new HashMap<Integer, Integer>();
+	     mSoundPoolMap = new HashMap<Integer, Integer>();
 	     mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
 	} 
 	
@@ -82,7 +72,7 @@ public class SoundManager {
 	 * Loads the various sound assets
 	 * @param: state - game state
 	 */
-	public static void loadSounds(int state)
+	public static boolean loadSounds(int state)
 	{
 		mAudioManager.unloadSoundEffects();
 		
@@ -101,15 +91,15 @@ public class SoundManager {
 			break;
 		case CASTABLE: //reel casting
 			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.reelcast, 1));
-			mJesterSayings.put(1, mSoundPool.load(mContext, R.raw.cast_away, 1));
+			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.cast_away, 1));
 			break;
 		case REELABLE: //reeling sounds
-			mSoundPoolClick.put(4, mSoundPool.load(mContext, R.raw.clickdouble, 1));
+			mSoundPoolMap.put(4, mSoundPool.load(mContext, R.raw.clickdouble, 1));
 			mSoundPoolMap.put(5, mSoundPool.load(mContext, R.raw.snapped_the_line, 1));
 			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.hooked_something2, 1));
 			mSoundPoolMap.put(3, mSoundPool.load(mContext, R.raw.got_away, 1));
-			mSoundPoolMap.put(4, mSoundPool.load(mContext, R.raw.kings_not_garbage, 1));
-			mJesterSayings.put(1, mSoundPool.load(mContext, R.raw.napoleon_plunder, 1));
+			//mSoundPoolMap.put(4, mSoundPool.load(mContext, R.raw.kings_not_garbage, 1));
+			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.napoleon_plunder, 1));
 			break;
 		case FAIL: //fail sounds
 			break;
@@ -118,22 +108,23 @@ public class SoundManager {
 		case POUT: //king pouting sounds
 			break;
 		case SHAKABLE: //coins, loot, king whining
-			mSoundPoolCoins.put(1, mSoundPool.load(mContext, R.raw.coinsmall, 1));
+			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.coinsmall, 1));
 			break;
 		case FLINGABLE: //king yelling, splash
 			mSoundPoolMap.put(6, mSoundPool.load(mContext, R.raw.throw_it_back ,1));
 			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.splash ,1));
 			//load up a splash sound to play after ah.
-			mKingSayings.put(1, mSoundPool.load(mContext, R.raw.ah, 1));
+			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.ah, 1));
 			break;
 		case ACHIEVEMENT: //why can't I hold all these golds?
 			break;
 		case VICTORY: //yay, you win.
 			break;
 		}
+		return true;
 	}
 	
-	/** TODO: we will only need playSound after the above TODOs are completed. remove the others.
+	/**
 	 * Plays a Sound
 	 * 
 	 * @param index - The Index of the Sound to be played
@@ -141,41 +132,9 @@ public class SoundManager {
 	 */
 	public static void playSound(int index,float speed) 
 	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mSoundPoolMap.get(index), streamVolume, streamVolume, 1, 0, speed); 
-	}
-	
-	public static void playClickSound(int index,float speed) 
-	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mSoundPoolClick.get(index), streamVolume, streamVolume, 1, 0, speed); 
-	}
-	
-	public static void playKingSound(int index,float speed) 
-	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mKingSayings.get(index), streamVolume, streamVolume, 1, 0, speed); 
-	}
-	public static void playCoinSound(int index,float speed) 
-	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mSoundPoolCoins.get(index), streamVolume, streamVolume, 1, 0, speed); 
-	}
-	public static void playJesterSound(int index,float speed) 
-	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mJesterSayings.get(index), streamVolume, streamVolume, 1, 0, speed); 
-	}
-	public static void playSplashSound(int index,float speed) 
-	{ 		
-		     float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-		     streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		     mSoundPool.play(mSoundSplash.get(index), streamVolume, streamVolume, 1, 0, speed); 
+		float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
+		streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		mSoundPool.play(mSoundPoolMap.get(index), streamVolume, streamVolume, 1, 0, speed); 
 	}
 	
 	/**
@@ -187,7 +146,7 @@ public class SoundManager {
 		mSoundPool.stop(mSoundPoolMap.get(index));
 	}
 	
-	/**
+	/**TODO: call me onDestroy of any activity.
 	 * Release sound assets, clear the hashmap, unload the audio manager, destroy the static instance
 	 */
 	public static void cleanup()

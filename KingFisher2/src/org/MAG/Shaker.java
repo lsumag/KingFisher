@@ -78,7 +78,7 @@ public class Shaker extends Activity implements SensorEventListener {
         	shiverTimbers++;
         	
         	vibrotron.vibrate(300);
-        	SoundManager.playCoinSound(1, 1);
+        	SoundManager.playSound(1, 1);
         	
         	if (shiverTimbers > 15) {
         		sensorManager.unregisterListener(this);

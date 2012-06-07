@@ -79,7 +79,7 @@ public class Rejecterator extends Activity implements SensorEventListener {
 				Log.e("KingFisher", "Throw him in the river!");
 				
 				vibrotron.vibrate(1500);
-				SoundManager.playKingSound(1, 1);
+				SoundManager.playSound(1, 1);
 				
 				sensorManager.unregisterListener(this);
 				//SoundManager.playJesterSound(1, 1);

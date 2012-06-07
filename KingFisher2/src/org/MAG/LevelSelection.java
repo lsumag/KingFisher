@@ -9,6 +9,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.SoundPool;
+import android.media.SoundPool.OnLoadCompleteListener;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.view.PagerAdapter;
@@ -25,7 +27,7 @@ import android.widget.ImageView;
  * @author UnderGear
  *
  */
-public class LevelSelection extends Activity implements SensorEventListener, OnPageChangeListener {
+public class LevelSelection extends Activity implements SensorEventListener, OnPageChangeListener, OnLoadCompleteListener {
 
 	private static final String TAG = "LevelSelection";
 	
@@ -61,9 +63,6 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
-		//Load up the sounds for the LevelSelection Activity!
-        SoundManager.loadSounds(SoundManager.LEVEL);
         
         //Level 0 is always unlocked and selected.
         levelScreens[0] = new ImageView(this);
@@ -119,6 +118,10 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	public void onResume() {
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		
+		//Load up the sounds for the LevelSelection Activity!
+        //SoundManager.loadSounds(SoundManager.LEVEL);
+		
 	}
 
 	/**
@@ -212,5 +215,10 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		Log.d(TAG, ""+position);
 		
 		selectedLevel = position;
+	}
+
+	public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+		Log.d(TAG, "soundpool loaded");
+		
 	}
 }

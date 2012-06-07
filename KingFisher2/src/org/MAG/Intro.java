@@ -19,6 +19,11 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
 	private MediaPlayer mediaPlayer;
 	
 	/** TODO: this can probably all be tossed into KingFisher2Activity instead of having its own Activity
+	 * TODO: activity stack planning.
+	 * mode selection will be the root of the back stack.
+	 * level selection will stay on as well.
+	 * 
+	 * 
 	 * Called when this activity begins. set the window up, get a media player for an intro video, set a touch listener, listen for media completion
 	 * 
 	 * @param savedInstanceState

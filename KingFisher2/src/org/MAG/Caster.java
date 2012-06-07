@@ -61,9 +61,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         casterBackground = (ImageView)findViewById(R.id.caster_background);
         casterBackground.setOnTouchListener(this);
         
-        
-        SoundManager.loadSounds(SoundManager.CASTABLE);
-        
         //TODO: instructional audio
         
         //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
@@ -82,8 +79,13 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	public void onResume() {
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+		
+		
+        SoundManager.loadSounds(SoundManager.CASTABLE);
+		
+        //TODO: wait for a few seconds, then play the sound.
+		//SoundManager.playSound(2, 1);
 	}
-	
 
 	/**
 	 * Listener called when the screen is touched. Only the casterBackground should be using this listener.

@@ -98,6 +98,9 @@ public class Reeler extends Activity implements OnTouchListener {
 	 */
 	private void hook() {
 		Log.e(TAG, "HOOK!");
+		
+		SoundManager.playSound(2, 1);
+		
 		//TODO: determine what it is we've hooked based on random numbers and distance.
 		reelerBackground.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
