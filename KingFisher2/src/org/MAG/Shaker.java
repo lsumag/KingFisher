@@ -40,8 +40,9 @@ public class Shaker extends Activity implements SensorEventListener {
             catchID = extras.getInt("CatchID");
             Log.d(TAG, "Catch ID: " + catchID);
         }
-		
-		shiverTimbers = 0;
+        
+        //TODO: we need to add a surfaceview for the king and any loot he'll drop.
+        
 		Log.e("KingFisher", "made the Shaker");
 		
 		SoundManager.loadSounds(SoundManager.SHAKABLE);
@@ -61,6 +62,8 @@ public class Shaker extends Activity implements SensorEventListener {
 	public void onResume() {
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+		
+		//TODO: wait, then "shake him down for the plunder!"
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }

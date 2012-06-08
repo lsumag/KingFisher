@@ -61,7 +61,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         casterBackground = (ImageView)findViewById(R.id.caster_background);
         casterBackground.setOnTouchListener(this);
         
-        //TODO: instructional audio
+        //TODO: instructional audio - tell the user how to cast!
         
         //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);

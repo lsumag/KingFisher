@@ -101,13 +101,15 @@ public class Reeler extends Activity implements OnTouchListener {
 		
 		SoundManager.playSound(2, 1);
 		
-		//TODO: determine what it is we've hooked based on random numbers and distance.
+		//TODO: determine what it is we've hooked based on random numbers, your bait, and distance.
 		reelerBackground.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
 		struggleTask.execute();
 	}
 	
 	private void success() {
+		
+		//TODO: go to the Catcher next. it will decide what to do from there. it will need the level ID and the catch ID
 		
 		if (struggleTask != null) struggleTask.cancel(true);
 		Log.e(TAG, "SUCCESS!");

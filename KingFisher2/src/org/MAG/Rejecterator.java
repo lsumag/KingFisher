@@ -60,6 +60,8 @@ public class Rejecterator extends Activity implements SensorEventListener {
 	public void onResume() {
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+		
+		//TODO: wait, then "throw it back"
 	}
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {

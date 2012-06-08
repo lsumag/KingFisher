@@ -96,9 +96,9 @@ public class SoundManager {
 		case REELABLE: //reeling sounds
 			mSoundPoolMap.put(4, mSoundPool.load(mContext, R.raw.clickdouble, 1));
 			mSoundPoolMap.put(5, mSoundPool.load(mContext, R.raw.snapped_the_line, 1));
-			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.hooked_something2, 1));
+			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.reel_it_in1, 1));
 			mSoundPoolMap.put(3, mSoundPool.load(mContext, R.raw.got_away, 1));
-			//mSoundPoolMap.put(4, mSoundPool.load(mContext, R.raw.kings_not_garbage, 1));
+			mSoundPoolMap.put(6, mSoundPool.load(mContext, R.raw.kings_not_garbage, 1));
 			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.napoleon_plunder, 1));
 			break;
 		case FAIL: //fail sounds
