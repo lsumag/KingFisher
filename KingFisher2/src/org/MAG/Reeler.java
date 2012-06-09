@@ -99,6 +99,7 @@ public class Reeler extends Activity implements OnTouchListener {
 	private void hook() {
 		Log.e(TAG, "HOOK!");
 		
+		vibrotron.vibrate(500);
 		SoundManager.playSound(2, 1);
 		
 		//TODO: determine what it is we've hooked based on random numbers, your bait, and distance.
@@ -191,6 +192,7 @@ public class Reeler extends Activity implements OnTouchListener {
 			while (true) {
 				try {
 					Thread.sleep(1000); //TODO: time should depend on what you've hooked.
+					vibrotron.vibrate(300);
 				} catch (InterruptedException e) {
 					Log.e(TAG, e.getMessage());
 				}

@@ -6,10 +6,10 @@ public class Sprite {
 
 	private String name;
 	private Bitmap bmp;
-	private int x, y;
+	private float x, y; //these are relative coordinates, not absolute.
 	private float rotation;
 	
-	public Sprite(String name, Bitmap bmp, int x, int y, float rotation) {
+	public Sprite(String name, Bitmap bmp, float x, float y, float rotation) {
 		this.name = name;
 		this.bmp = bmp;
 		this.x = x;
@@ -17,11 +17,11 @@ public class Sprite {
 		this.rotation = rotation;
 	}
 	
-	public int getX() {
+	public float getX() {
 		return x;
 	}
 	
-	public int getY() {
+	public float getY() {
 		return y;
 	}
 	

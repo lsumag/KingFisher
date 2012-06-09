@@ -31,7 +31,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	private float m_totalForcePrev;
 	private int timbersShivered; //a counter for how many times the user has shaken the king
 	
-	private Sprite king;
+	private Sprite king, coinPile, fallingLoot;
 	
 	private int catchID; //TODO: used to determine which king we will draw. add logic for more kings later.
 	
@@ -52,14 +52,14 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         
         foreground = (MySurfaceView)findViewById(R.id.shaker_foreground);
         
+        //TODO: these are hardcoded right now. we could easily create a list up at the top and look up which drawables and names to use based on that.
         king = new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0, 0, 0);
-        //TODO: fill sprites with the correct stuff based on the king we caught. we might want to double check that it IS a king, too.
-        foreground.addSprite(king);
+        coinPile = new Sprite("Coin Pile", BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0, 0.5f, 0);
         
+        foreground.addSprite(king);
         
         holder = foreground.getHolder();
         holder.setFormat(PixelFormat.TRANSPARENT);
-        
         
         holder.addCallback(this);
         
@@ -107,9 +107,25 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         	vibrotron.vibrate(300);
         	SoundManager.playSound(1, 1);
         	
-        	
-        	
-        	if (timbersShivered > 20) {
+        	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview.
+        	case 5:
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
+        		break;
+        	case 7:
+        		foreground.addSprite(coinPile);
+        		break;
+        	case 10:
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite3));
+        		break;
+        	case 12:
+        		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile2));
+        	case 15:
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite4));
+        		break;
+        	case 17:
+        		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile3));
+        		break;
+        	case 20:
         		sensorManager.unregisterListener(this);
         		//TODO: jump to the next activity now. bundle up which king was caught and send it along! we also need the levelID still.
         		
@@ -122,21 +138,16 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         		} catch (ClassNotFoundException ex) {
         			Log.e(TAG, "Failed to jump to another activity");
         		}
-    		}
-        	else if (timbersShivered > 15) {
-        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite4));
-        	}
-        	else if (timbersShivered > 10) {
-        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite3));
-        	}
-        	else if (timbersShivered > 5) {
-        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
+        		break;
+        	default:
+        		m_totalForcePrev = (float) totalForce;
+        		return;
         	}
         	foreground.replaceSprite(0, king);
         	drawSprites();
         }
-       
         m_totalForcePrev = (float) totalForce;
+        
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) { }
