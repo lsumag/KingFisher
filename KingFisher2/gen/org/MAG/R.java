@@ -99,8 +99,9 @@ public final class R {
         public static final int reeler_background=0x7f060004;
         public static final int rejecterator_background=0x7f060005;
         public static final int shaker_background=0x7f060006;
+        public static final int shaker_foreground=0x7f060007;
         public static final int title_image=0x7f060001;
-        public static final int travel_background=0x7f060007;
+        public static final int travel_background=0x7f060008;
         public static final int viewpager=0x7f060002;
     }
     public static final class layout {

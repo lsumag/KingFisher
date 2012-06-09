@@ -80,6 +80,8 @@ public class Rejecterator extends Activity implements SensorEventListener {
 				
 				Log.e("KingFisher", "Throw him in the river!");
 				
+				//TODO: asynctask to shrink, move, and rotate the sprite we're throwing back.
+				
 				vibrotron.vibrate(1500);
 				SoundManager.playSound(1, 1);
 				

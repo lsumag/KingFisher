@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,7 +29,9 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
 	private float m_totalForcePrev;
-	private int shiverTimbers; //a counter for how many times the user has shaken the king
+	private int timbersShivered; //a counter for how many times the user has shaken the king
+	
+	private Sprite king;
 	
 	private int catchID; //TODO: used to determine which king we will draw. add logic for more kings later.
 	
@@ -49,9 +52,14 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         
         foreground = (MySurfaceView)findViewById(R.id.shaker_foreground);
         
-        //TODO: fill sprites with the correct stuff based on our catch.
-        foreground.addSprite(new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0, 0, 0));
+        king = new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0, 0, 0);
+        //TODO: fill sprites with the correct stuff based on the king we caught. we might want to double check that it IS a king, too.
+        foreground.addSprite(king);
+        
+        
         holder = foreground.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        
         
         holder.addCallback(this);
         
@@ -62,6 +70,9 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 		vibrotron = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        
+        foreground.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        foreground.setZOrderOnTop(true);
 	}
 	
 	@Override
@@ -91,14 +102,14 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
        
         if ((totalForce < forceThreshHold) && (m_totalForcePrev > forceThreshHold)) {
         	Log.e("KingFisher", "SHAKE!");
-        	shiverTimbers++;
+        	timbersShivered++;
         	
         	vibrotron.vibrate(300);
         	SoundManager.playSound(1, 1);
         	
         	
         	
-        	if (shiverTimbers > 15) {
+        	if (timbersShivered > 20) {
         		sensorManager.unregisterListener(this);
         		//TODO: jump to the next activity now. bundle up which king was caught and send it along! we also need the levelID still.
         		
@@ -111,10 +122,17 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         		} catch (ClassNotFoundException ex) {
         			Log.e(TAG, "Failed to jump to another activity");
         		}
-        		
-        		
     		}
-        	
+        	else if (timbersShivered > 15) {
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite4));
+        	}
+        	else if (timbersShivered > 10) {
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite3));
+        	}
+        	else if (timbersShivered > 5) {
+        		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
+        	}
+        	foreground.replaceSprite(0, king);
         	drawSprites();
         }
        
@@ -132,7 +150,6 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
-        	Log.d(TAG, "valid");
 	        Canvas canvas = holder.lockCanvas();
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
