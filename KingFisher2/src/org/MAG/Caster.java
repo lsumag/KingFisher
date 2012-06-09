@@ -33,7 +33,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private ImageView casterBackground;
 	
 	private int levelID;
-	private int castDistance;
+	private int castDistance = 100; //TODO: change from 100 by default.
 	
 	//TODO: we need a way to keep track of the quality of the cast.
 	

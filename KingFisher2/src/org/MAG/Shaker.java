@@ -53,9 +53,8 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         foreground = (MySurfaceView)findViewById(R.id.shaker_foreground);
         
         //TODO: these are hardcoded right now. we could easily create a list up at the top and look up which drawables and names to use based on that.
-        king = new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
-        coinPile = new Sprite("Coin Pile", BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0.5f, 1.0f, 0, Sprite.ALIGNMENT_BOTTOM);
-        //TODO: let's clip off a lot of the coin pile's extra alpha stuff.
+        king = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+        coinPile = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0.5f, 1.0f, 0, Sprite.ALIGNMENT_BOTTOM);
         
         foreground.addSprite(king);
         
@@ -108,27 +107,34 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         	vibrotron.vibrate(300);
         	SoundManager.playSound(1, 1);
         	
-        	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview.
+        	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview. we need falling coins now. rotate the king a bit more.
         	case 5:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
+        		king.setRotation(5.0f);
         		break;
         	case 7:
         		foreground.addSprite(coinPile);
+        		king.setRotation(0.0f);
         		break;
         	case 10:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite3));
+        		king.setRotation(-5.0f);
         		break;
         	case 12:
         		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile2));
+        		king.setRotation(0.0f);
         	case 15:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite4));
+        		king.setRotation(5.0f);
         		break;
         	case 17:
         		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile3));
+        		king.setRotation(0.0f);
         		break;
         	case 20:
         		sensorManager.unregisterListener(this);
-        		//TODO: jump to the next activity now. bundle up which king was caught and send it along! we also need the levelID still.
+        		holder.removeCallback(this);
+        		//TODO: bundle up which king was caught and send it along! we also need the levelID still.
         		
         		try {
                 	Intent ourIntent = new Intent(Shaker.this, Class.forName("org.MAG.Rejecterator"));
@@ -144,7 +150,6 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         		m_totalForcePrev = (float) totalForce;
         		return;
         	}
-        	foreground.replaceSprite(0, king);
         	drawSprites();
         }
         m_totalForcePrev = (float) totalForce;

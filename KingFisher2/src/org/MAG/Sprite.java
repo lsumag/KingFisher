@@ -2,8 +2,14 @@ package org.MAG;
 
 import android.graphics.Bitmap;
 
+/**
+ * Contains everything for drawing sprites to a MySurfaceView
+ * @author undergear
+ *
+ */
 public class Sprite {
 
+	//Alignment Constants
 	public static final int ALIGNMENT_CENTER = 0;
 	public static final int ALIGNMENT_TOP = 1;
 	public static final int ALIGNMENT_BOTTOM = 2;
@@ -14,15 +20,21 @@ public class Sprite {
 	public static final int ALIGNMENT_BOTTOMLEFT = 7;
 	public static final int ALIGNMENT_BOTTOMRIGHT = 8;
 	
-	//TODO: alignment! let's be able to align to the bottom, top, center, etc.
-	private String name;
-	private Bitmap bmp;
+	private Bitmap bmp; //the actual image!
 	private float x, y; //these are relative coordinates, not absolute. 0.0f-1.0f
-	private float rotation;
-	private float alignX, alignY;
+	private float rotation; //the rotation of the sprite in degrees
+	private float alignX, alignY; //x- and y-alignments of the sprite. These will be calculated by the constructor based on int alignment.
 	
-	public Sprite(String name, Bitmap bmp, float x, float y, float rotation, int alignment) {
-		this.name = name;
+	/**
+	 * Constructor. x and y should be values 0.0f-1.0f, representing a relative point on the screen. alignX, alignY should be set with alignment as Sprite.ALIGNMENT_*
+	 * 
+	 * @param bmp image of the sprite
+	 * @param x relative coordinate
+	 * @param y relative coordinate
+	 * @param rotation of the sprite
+	 * @param alignment where the sprite will be pinned
+	 */
+	public Sprite(Bitmap bmp, float x, float y, float rotation, int alignment) {
 		this.bmp = bmp;
 		this.x = x;
 		this.y = y;
@@ -30,40 +42,41 @@ public class Sprite {
 		switch (alignment) {
 		
 		case ALIGNMENT_CENTER:
-			setAlignX(setAlignY(0.5f));
+			alignX = alignY = 0.5f;
 			break;
 		case ALIGNMENT_TOP:
-			setAlignX(0.5f);
-			setAlignY(0.0f);
+			alignX = 0.5f;
+			alignY = 0.0f;
 			break;
 		case ALIGNMENT_BOTTOM:
-			setAlignX(0.5f);
-			setAlignY(1.0f);
+			alignX = 0.5f;
+			alignY = 1.0f;
 			break;
 		case ALIGNMENT_LEFT:
-			setAlignX(0.0f);
-			setAlignY(0.5f);
+			alignX = 0.0f;
+			alignY = 0.5f;
 			break;
 		case ALIGNMENT_RIGHT:	
-			setAlignX(1.0f);
-			setAlignY(0.5f);
+			alignX = 1.0f;
+			alignY = 0.5f;
 			break;
 		case ALIGNMENT_TOPLEFT:
-			setAlignX(setAlignY(0.0f));
+			alignX = alignY = 0.0f;
 			break;
 		case ALIGNMENT_TOPRIGHT:
-			setAlignX(1.0f);
-			setAlignY(0.0f);
+			alignX = 1.0f;
+			alignY = 0.0f;
 			break;
 		case ALIGNMENT_BOTTOMLEFT:
-			setAlignX(0.0f);
-			setAlignY(1.0f);
+			alignX = 0.0f;
+			alignY = 1.0f;
 			break;
 		case ALIGNMENT_BOTTOMRIGHT:
-			setAlignX(setAlignY(1.0f));
+			alignX = alignY = 1.0f;
+			alignY = 0.0f;
 			break;
 		default:
-			setAlignX(setAlignY(0.0f)); //default topleft
+			alignX = alignY = 0.0f; //default topleft
 			break;
 		}
 	}
@@ -80,10 +93,6 @@ public class Sprite {
 		return bmp;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	
 	public float getRotation() {
 		return rotation;
 	}
@@ -95,21 +104,12 @@ public class Sprite {
 	public void setImage(Bitmap bmp) {
 		this.bmp = bmp;
 	}
-
-	public float getAlignX() {
-		return alignX;
-	}
-
-	public void setAlignX(float alignX) {
-		this.alignX = alignX;
-	}
-
+	
 	public float getAlignY() {
 		return alignY;
 	}
-
-	public float setAlignY(float alignY) {
-		this.alignY = alignY;
-		return alignY;
+	
+	public float getAlignX() {
+		return alignX;
 	}
 }

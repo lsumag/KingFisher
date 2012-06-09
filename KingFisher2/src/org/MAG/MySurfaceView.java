@@ -20,26 +20,26 @@ import android.view.SurfaceView;
  */
 public class MySurfaceView extends SurfaceView {
 
-	private ArrayList<Sprite> sprites;
-	private Paint clearPaint = new Paint(Paint.ANTI_ALIAS_FLAG); //this is used to fill in the foreground alpha before we draw sprites there
+	private ArrayList<Sprite> sprites; //list of the sprites to be drawn on this surface
 	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); //this paint will be used to draw each sprite
 	
+	/**
+	 * Constructors.
+	 * @param context
+	 */
 	public MySurfaceView(Context context) {
 		super(context);
 		sprites = new ArrayList<Sprite>();
-		clearPaint.setColor(Color.TRANSPARENT);
 	}
 	
 	public MySurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		sprites = new ArrayList<Sprite>();
-		clearPaint.setColor(Color.TRANSPARENT);
 	}
 	
 	public MySurfaceView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		sprites = new ArrayList<Sprite>();
-		clearPaint.setColor(Color.TRANSPARENT);
 	}
 	
 	/**
@@ -50,42 +50,69 @@ public class MySurfaceView extends SurfaceView {
 	@Override
 	public void draw(Canvas canvas) {
 		
-		if (getHolder().getSurface().isValid()) {
-			canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-			canvas.drawPaint(clearPaint);
+		if (getHolder().getSurface().isValid()) { //Make sure that the surface is actually valid before trying to draw on it!
 			
-			for (Sprite sprite : sprites) {
+			canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //Clear out what was previously there with alpha.
+			
+			for (Sprite sprite : sprites) { //Iterate through our sprites list.
 				
-				//TODO: make this go for the sprite's alignment. instead of 0.5f (centered), keep a variable
-				float x = this.getWidth() * sprite.getX() - sprite.getImage().getWidth() * sprite.getAlignX();
-				float y = this.getHeight() * sprite.getY() - sprite.getImage().getHeight() * sprite.getAlignY();
+				float x, y; //Absolute coordinates at which to draw the sprite. Remember, this is the top left of the image.
 				
-				//Log.e("Sprite", ""+sprite.getName() + " " + sprite.getRotation());
-				if (sprite.getRotation() == 0.) {
-					canvas.drawBitmap(sprite.getImage(), x, y, paint); //TODO: coords here.
-				} else {
-					Matrix mtx = new Matrix();
-					//mtx.postRotate(sprite.getRotation(), sprite.getX() + sprite.getImage().getWidth()/2, sprite.getY() + sprite.getImage().getHeight()/2);
-					mtx.postRotate(sprite.getRotation());
-					// Rotating Bitmap
-					Bitmap rotatedBMP = Bitmap.createBitmap(sprite.getImage(), 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), mtx, true);
-					canvas.drawBitmap(rotatedBMP, x, y, paint); //TODO: coords here.
+				if (sprite.getRotation() == 0.) { //If the sprite is not rotated
+					
+					//Calculate absolute coordinates to draw each sprite. Based on relative coordinates, its height/width, and its alignment settings.
+					x = this.getWidth() * sprite.getX() - sprite.getImage().getWidth() * sprite.getAlignX();
+					y = this.getHeight() * sprite.getY() - sprite.getImage().getHeight() * sprite.getAlignY();
+					
+					canvas.drawBitmap(sprite.getImage(), x, y, paint); //Draw the sprite at our coordinates!
+				} else { //The sprite is rotated. We will have to account for this.
+					
+					//Rotation matrix we'll use on the sprite's bitmap
+					Matrix matrix = new Matrix();
+					
+					//matrix.setTranslate(x, y);
+					
+					matrix.postRotate(sprite.getRotation(), sprite.getImage().getWidth() * sprite.getAlignX(), sprite.getImage().getHeight() * sprite.getAlignY());
+					
+					//matrix.postRotate(sprite.getRotation());
+					
+					//Rotated bitmap. Its size is different from the original. NOTE: DO NOT overwrite the sprite's bitmap with this rotated one.
+					Bitmap rotatedBMP = Bitmap.createBitmap(sprite.getImage(), 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), matrix, true);
+					
+					//Same calculation as before, but with the rotated bitmap instead of the original.
+					x = this.getWidth() * sprite.getX() - rotatedBMP.getWidth() * sprite.getAlignX();
+					y = this.getHeight() * sprite.getY() - rotatedBMP.getHeight() * sprite.getAlignY();
+					
+					canvas.drawBitmap(rotatedBMP, x, y, paint); //Draw the sprite at our coordinates!
 				}
 			}
 		}
-		super.draw(canvas);
+		super.draw(canvas); //Pass it off to super to deal with.
 	}
 	
+	/**
+	 * Adding sprite to our list of sprites.
+	 * 
+	 * @param sprite to add
+	 */
 	public void addSprite(Sprite sprite) {
 		sprites.add(sprite);
 	}
 	
+	/**
+	 * Replacing the sprite at index
+	 * 
+	 * @param index
+	 * @param newSprite
+	 */
 	public void replaceSprite(int index, Sprite newSprite) {
 		sprites.set(index, newSprite);
 	}
 	
+	/**
+	 * Wipe out our sprites.
+	 */
 	public void clearSprites() {
 		sprites.clear();
 	}
-
 }

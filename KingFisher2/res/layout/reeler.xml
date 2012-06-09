@@ -7,5 +7,9 @@
 	<ImageView android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:id="@+id/reeler_background"
-    android:background="@drawable/cast2_animation_44"/>
+    android:background="@drawable/cast_animation_03"/>
+	
+	<org.MAG.MySurfaceView android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/reeler_foreground" />
 </FrameLayout>

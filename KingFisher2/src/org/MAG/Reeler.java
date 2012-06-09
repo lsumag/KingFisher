@@ -6,13 +6,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,31 +27,40 @@ import android.widget.ImageView;
  * @author UnderGear
  *
  */
-public class Reeler extends Activity implements OnTouchListener {
+public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.Callback {
 
 	private static final String TAG = "Reeler";
 	
-	private ImageView reelerBackground;
-	private SurfaceView foreground;
+	private ImageView background;
+	private MySurfaceView foreground;
+	private SurfaceHolder holder;
+	
 	private Vibrator vibrotron;
 	
-	private WaitForHookTask waitTask;
-	private StruggleTask struggleTask;
+	private WaitForHookTask waitTask; //AsyncTask - while waiting for a bite
+	private StruggleTask struggleTask; //AsyncTask - working against player while reeling
 	
-	private Random random;
+	private Random random; //Random to determine what hooks on the line
 	
+	//For determining where a touch is on the screen relative to the center. Cartesian -> Polar
 	private static final DisplayMetrics metrics = new DisplayMetrics();
 	private int minusHalfWidth, minusHalfHeight;
-	
-	private boolean fingerDown;
 	private float currentTheta;
 	private float currentRadius;
 	private float previousTheta;
 	private float previousRadius;
 	private float x, y;
-	private float angularDelta;
-	private float distance, lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast. we should have something about your hook and rod, too.
-	private int levelID, catchID;
+	private float angularDelta; //Change in radians since last event
+	
+	private Sprite rod, spindle; //to be drawn on the foreground.
+	
+	private boolean fingerDown;
+	
+	//Passed in from Caster activity or calculated (at least partially) from that
+	private int levelID, catchID; //from Bundle.
+	private float distance = 100;
+	private float lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast. we should have something about your hook and rod, too.
+	
 	/**
 	 * Called on Activity creation. Set the background, touch listener, vibrator, load up sounds.
 	 * 
@@ -70,7 +82,13 @@ public class Reeler extends Activity implements OnTouchListener {
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         setContentView(R.layout.reeler);
-        reelerBackground = (ImageView)findViewById(R.id.reeler_background);
+        background = (ImageView)findViewById(R.id.reeler_background);
+        foreground = (MySurfaceView)findViewById(R.id.reeler_foreground);
+        
+        holder = foreground.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        
+        holder.addCallback(this);
         
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int height = metrics.heightPixels;
@@ -86,8 +104,16 @@ public class Reeler extends Activity implements OnTouchListener {
         
         //TODO: implement foreground images/background animation - the fishing rod should be in the front. we need a background animation/video
         //TODO: instructional audio - waiting/patience
+        foreground.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        foreground.setZOrderOnTop(true);
         
-        //TODO: determine what will be caught and its stats. this will be based on quality of cast, equipment, and current level
+        rod = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.reel_back_sprite), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+        spindle = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.reel_handle_sprite), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+        
+        foreground.addSprite(rod);
+        foreground.addSprite(spindle);
+        
+        drawSprites();
         
         waitTask = new WaitForHookTask();
         waitTask.execute();
@@ -102,8 +128,8 @@ public class Reeler extends Activity implements OnTouchListener {
 		vibrotron.vibrate(500);
 		SoundManager.playSound(2, 1);
 		
-		//TODO: determine what it is we've hooked based on random numbers, your bait, and distance.
-		reelerBackground.setOnTouchListener(this);
+		//TODO: determine what it is we've hooked based on random numbers, your bait, the current level ID, and distance.
+		background.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
 		struggleTask.execute();
 	}
@@ -114,11 +140,11 @@ public class Reeler extends Activity implements OnTouchListener {
 		
 		if (struggleTask != null) struggleTask.cancel(true);
 		Log.e(TAG, "SUCCESS!");
-		reelerBackground.setOnTouchListener(null);
+		background.setOnTouchListener(null);
+		holder.removeCallback(this);
 		
 		//TODO: we're going to launch the next activity based on what was caught. if it was junk, rejecterator. if it was a king, shaker.
 		//TODO: bundle up the catch's ID and ship it off to the next intent.
-		//TODO: if we caught a king, launch the shaker activity.
 		
 		try {
         	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Shaker"));
@@ -136,7 +162,8 @@ public class Reeler extends Activity implements OnTouchListener {
 		
 		Log.e(TAG, "RECAST!");
 		
-		reelerBackground.setOnTouchListener(null);
+		background.setOnTouchListener(null);
+		holder.removeCallback(this);
 		
 		try {
         	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Caster"));
@@ -163,7 +190,7 @@ public class Reeler extends Activity implements OnTouchListener {
 		protected Boolean doInBackground(Void... params) {
 			
 			try {
-				Thread.sleep(random.nextInt(10) * 1000 + 1000); // wait for a random amount of time. 1-11 seconds. TODO: make this depend upon the cast quality? less magic numbery. wider range.
+				Thread.sleep(random.nextInt(10) * 1000 + 1000); // wait for a random amount of time. 1-11 seconds. TODO: make this depend upon the cast quality and bait? less magic numbery. wider range.
 			} catch (InterruptedException e) {
 				Log.e(TAG, e.getMessage());
 			}
@@ -193,14 +220,14 @@ public class Reeler extends Activity implements OnTouchListener {
 				try {
 					Thread.sleep(1000); //TODO: time should depend on what you've hooked.
 					vibrotron.vibrate(300);
+					
+					//TODO: fish line break attempt. damage the line based on level difficulty
+					if (!fingerDown) distance += 5; //TODO: depends upon what's hooked as well. you should hold down to prevent the fish from unreeling itself.
+					
+					if (lineStrength <= 0) return true;
 				} catch (InterruptedException e) {
 					Log.e(TAG, e.getMessage());
 				}
-				//TODO: fish line break attempt. damage the line based on level difficulty
-				
-				if (!fingerDown) distance += 5; //TODO: depends upon what's hooked as well. you should hold down to prevent the fish from unreeling itself.
-				
-				if (lineStrength <= 0) return true;
 			}
 		}
 		
@@ -208,7 +235,6 @@ public class Reeler extends Activity implements OnTouchListener {
 		protected void onPostExecute(Boolean escape) {
 			if (escape) recast(); //the fish has broken the line and escaped. cast again.
 		}
-		
 	}
 	
 	public void onDestroy() {
@@ -228,6 +254,10 @@ public class Reeler extends Activity implements OnTouchListener {
 			previousRadius = (float) Math.sqrt( x * x + y * y ); //Euclidean distance of touch from center of screen
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
+			spindle.setRotation((float) (previousTheta * 180 / Math.PI));
+			
+			drawSprites();
+			
 			fingerDown = true;
 			
 			Log.d(TAG, "finger down.");
@@ -239,13 +269,21 @@ public class Reeler extends Activity implements OnTouchListener {
 			
 			
 			currentRadius = (float) Math.sqrt( x * x + y * y ); //distance of the touch from center of the screen
-			currentTheta = (float) Math.acos( x / currentRadius ); //angle in radians.
+			
+			if (y > 0)
+				currentTheta = (float) -Math.acos( x / currentRadius ); //angle in radians.
+			else
+				currentTheta = (float) Math.acos( x / currentRadius ); //angle in radians.
 			
 			angularDelta = Math.abs(currentTheta - previousTheta); //find the angular change in radians from last update
+			if(angularDelta > 3.1416f) angularDelta = (float) ((2.0 * Math.PI) - angularDelta);
+			
 			
 			Log.e(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
-		
 			
+			spindle.setRotation((float) -(currentTheta * 180 / Math.PI));
+			
+			drawSprites();
 			
 			distance -= angularDelta;
 			if (distance <= 0) success();
@@ -260,5 +298,22 @@ public class Reeler extends Activity implements OnTouchListener {
 			break;
 		}
 		return true;
+	}
+	
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) { }
+	
+
+	public void surfaceCreated(SurfaceHolder holder) {
+		drawSprites();
+	}
+
+	public void surfaceDestroyed(SurfaceHolder holder) { }
+
+	private void drawSprites() {
+		if (holder.getSurface().isValid()) {
+	        Canvas canvas = holder.lockCanvas();
+	        foreground.draw(canvas);
+	        holder.unlockCanvasAndPost(canvas);
+        }
 	}
 }
