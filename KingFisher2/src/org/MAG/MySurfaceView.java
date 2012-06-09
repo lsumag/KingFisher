@@ -54,15 +54,11 @@ public class MySurfaceView extends SurfaceView {
 			canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 			canvas.drawPaint(clearPaint);
 			
-			//TODO: set screen stuff up here.
-			
-			
-			//Log.e("Sprite number = ", ""+sprites.size());
 			for (Sprite sprite : sprites) {
 				
-				//TODO: convert sprite's relative coords to absolute here.
-				float x = this.getWidth() * sprite.getX();
-				float y = this.getHeight() * sprite.getY();
+				//TODO: make this go for the sprite's alignment. instead of 0.5f (centered), keep a variable
+				float x = this.getWidth() * sprite.getX() - sprite.getImage().getWidth() * sprite.getAlignX();
+				float y = this.getHeight() * sprite.getY() - sprite.getImage().getHeight() * sprite.getAlignY();
 				
 				//Log.e("Sprite", ""+sprite.getName() + " " + sprite.getRotation());
 				if (sprite.getRotation() == 0.) {

@@ -53,8 +53,9 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         foreground = (MySurfaceView)findViewById(R.id.shaker_foreground);
         
         //TODO: these are hardcoded right now. we could easily create a list up at the top and look up which drawables and names to use based on that.
-        king = new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0, 0, 0);
-        coinPile = new Sprite("Coin Pile", BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0, 0.5f, 0);
+        king = new Sprite("Napoleon", BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+        coinPile = new Sprite("Coin Pile", BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0.5f, 1.0f, 0, Sprite.ALIGNMENT_BOTTOM);
+        //TODO: let's clip off a lot of the coin pile's extra alpha stuff.
         
         foreground.addSprite(king);
         
