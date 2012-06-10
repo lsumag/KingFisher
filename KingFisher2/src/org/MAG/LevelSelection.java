@@ -147,7 +147,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         
         //A shake event should occur at the end of the shake. Last acceleration is over threshold and this one is under it.
         if ((totalAcceleration < accelerationThreshold) && (totalPreviousAcceleration > accelerationThreshold)) {
-        	Log.e("KingFisher", "SHAKE!");
+        	//Log.d("KingFisher", "SHAKE!");
         	
         	//Launch the selected level only if it is unlocked. greater than 0 is unlocked.
         	if (levelStatus[selectedLevel] > 0) {
@@ -163,10 +163,10 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         			sensorManager.unregisterListener(this);
         			finish();
         		} catch (ClassNotFoundException ex) {
-        			Log.e("LEVELSELECTION", "Failed to jump to another activity");
+        			Log.e(TAG, "Failed to jump to another activity");
         		}
         	}
-        	//The selected level is not unlocked.
+        	//The selected level is locked.
         	else {
         		//TODO: if not available, vibrate "no" pattern. two buzzes in quick succession? play something like "you're not skilled enough to go here just yet"
         	}

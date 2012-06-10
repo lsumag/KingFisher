@@ -18,20 +18,31 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * Activity for shaking a king down for treasure.
+ * @author undergear
+ *
+ */
 public class Shaker extends Activity implements SensorEventListener, SurfaceHolder.Callback {
 
 	private static final String TAG = "Shaker";
 	
+	//foreground view
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
 	
+	//sprites to draw on foreground
+	private Sprite king, coinPile, fallingLoot;
+	
+	//hardware and a shake previous accelerometer reading
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
-	private float m_totalForcePrev;
-	private int timbersShivered; //a counter for how many times the user has shaken the king
+	private float lastReading;
+	private float accelerationThreshold = 2.5f;
+    private double totalAcceleration;
 	
-	private Sprite king, coinPile, fallingLoot;
+	private int timbersShivered; //a counter for how many times the user has shaken the king
 	
 	private int catchID; //TODO: used to determine which king we will draw. add logic for more kings later.
 	
@@ -62,8 +73,6 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         holder.setFormat(PixelFormat.TRANSPARENT);
         
         holder.addCallback(this);
-        
-		Log.e("KingFisher", "made the Shaker");
 		
 		SoundManager.loadSounds(SoundManager.SHAKABLE);
 		
@@ -93,20 +102,20 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 	
 	public void onSensorChanged(SensorEvent event) {
-		double forceThreshHold = 2.5f;
-        double totalForce = 0.0f;
-        totalForce += Math.pow(event.values[SensorManager.DATA_X]/SensorManager.GRAVITY_EARTH, 2.0);
-        totalForce += Math.pow(event.values[SensorManager.DATA_Y]/SensorManager.GRAVITY_EARTH, 2.0);
-        totalForce += Math.pow(event.values[SensorManager.DATA_Z]/SensorManager.GRAVITY_EARTH, 2.0);
-        totalForce = Math.sqrt(totalForce);
+		
+        totalAcceleration += Math.pow(event.values[SensorManager.DATA_X]/SensorManager.GRAVITY_EARTH, 2.0);
+        totalAcceleration += Math.pow(event.values[SensorManager.DATA_Y]/SensorManager.GRAVITY_EARTH, 2.0);
+        totalAcceleration += Math.pow(event.values[SensorManager.DATA_Z]/SensorManager.GRAVITY_EARTH, 2.0);
+        totalAcceleration = Math.sqrt(totalAcceleration);
        
-        if ((totalForce < forceThreshHold) && (m_totalForcePrev > forceThreshHold)) {
+        if ((totalAcceleration < accelerationThreshold) && (lastReading > accelerationThreshold)) {
         	Log.e("KingFisher", "SHAKE!");
         	timbersShivered++;
         	
         	vibrotron.vibrate(300);
         	SoundManager.playSound(1, 1);
         	
+        	//beat up the king, make him drop treasure based on how many shakes we've done.
         	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview. we need falling coins now. rotate the king a bit more.
         	case 5:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
@@ -136,6 +145,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         		holder.removeCallback(this);
         		//TODO: bundle up which king was caught and send it along! we also need the levelID still.
         		
+        		//Launch the next activity! Throw the king back.
         		try {
                 	Intent ourIntent = new Intent(Shaker.this, Class.forName("org.MAG.Rejecterator"));
                 	ourIntent.putExtra("CatchID", catchID);
@@ -147,24 +157,31 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         		}
         		break;
         	default:
-        		m_totalForcePrev = (float) totalForce;
+        		lastReading = (float) totalAcceleration;
         		return;
         	}
         	drawSprites();
         }
-        m_totalForcePrev = (float) totalForce;
+        lastReading = (float) totalAcceleration;
         
 	}
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) { }
 	
-
+	/**
+	 * The surface is ready. Let's draw on it!
+	 * 
+	 * @param holder
+	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		drawSprites();
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) { }
 
+	/**
+	 * Tell the foreground to draw its sprites
+	 */
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
 	        Canvas canvas = holder.lockCanvas();

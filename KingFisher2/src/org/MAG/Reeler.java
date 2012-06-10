@@ -23,7 +23,7 @@ import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
 /**
- * 
+ * Responsible for hooking something and reeling it in.
  * @author UnderGear
  *
  */
@@ -102,7 +102,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         
         random = new Random();
         
-        //TODO: implement foreground images/background animation - the fishing rod should be in the front. we need a background animation/video
         //TODO: instructional audio - waiting/patience
         foreground.getHolder().setFormat(PixelFormat.TRANSPARENT);
         foreground.setZOrderOnTop(true);
@@ -112,8 +111,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         
         foreground.addSprite(rod);
         foreground.addSprite(spindle);
-        
-        drawSprites();
         
         waitTask = new WaitForHookTask();
         waitTask.execute();
@@ -128,12 +125,15 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		vibrotron.vibrate(500);
 		SoundManager.playSound(2, 1);
 		
-		//TODO: determine what it is we've hooked based on random numbers, your bait, the current level ID, and distance.
+		//TODO: determine what it is we've hooked based on random numbers, your bait, the current level ID, and distance of the cast.
 		background.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
 		struggleTask.execute();
 	}
 	
+	/**
+	 * You caught something!
+	 */
 	private void success() {
 		
 		//TODO: go to the Catcher next. it will decide what to do from there. it will need the level ID and the catch ID
@@ -158,8 +158,10 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		
 	}
 	
+	/**
+	 * The line snapped or something. Cast again.
+	 */
 	private void recast() {
-		
 		Log.e(TAG, "RECAST!");
 		
 		background.setOnTouchListener(null);
@@ -184,7 +186,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private class WaitForHookTask extends AsyncTask<Void, Void, Boolean> {
 
 		/**
-		 * wait for a random amount of time and determine if there was a bite or not.
+		 * wait for a random amount of time before something gets hooked
 		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
@@ -214,6 +216,9 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 */
 	private class StruggleTask extends AsyncTask<Void, Void, Boolean> {
 		
+		/**
+		 * Have whatever we hooked attempt to escape.
+		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			while (true) {
@@ -231,6 +236,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			}
 		}
 		
+		/**
+		 * This is only called if the target has escaped. This thread is killed if we caught it first.
+		 * 
+		 * @param escape
+		 */
 		@Override
 		protected void onPostExecute(Boolean escape) {
 			if (escape) recast(); //The line was broken. Cast again.
@@ -243,6 +253,12 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		super.onPause();
 	}
 	
+	/**
+	 * The user has touched the screen
+	 * 
+	 * @param v view touched
+	 * @param event touch event
+	 */
 	public boolean onTouch(View v, MotionEvent event) {
 		
 		//offset our touch location. it is now relative to the center of the screen.
@@ -250,41 +266,43 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		x = event.getX(0);
 		y = event.getY(0);
 		
+		//switch based on the type of event
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			
 			previousRadius = (float) Math.sqrt( x * x + y * y ); //Euclidean distance of touch from center of screen
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
 			//NOTE: -40.0f is because our image isn't quite aligned on the x-axis
 			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
-			
 			drawSprites();
 			
 			fingerDown = true;
-			
 			break;
 		case MotionEvent.ACTION_MOVE:
-			
 			currentRadius = (float) Math.sqrt( x * x + y * y ); //distance of the touch from center of the screen
 			
+			//let's determine the angle we're at - will be in radians.
 			if (y > 0)
-				currentTheta = (float) -Math.acos( x / currentRadius ); //angle in radians.
+				currentTheta = (float) Math.acos( x / currentRadius );
 			else
-				currentTheta = (float) Math.acos( x / currentRadius ); //angle in radians.
+				currentTheta = (float) -Math.acos( x / currentRadius );
 			
-			angularDelta = Math.abs(currentTheta - previousTheta); //find the angular change in radians from last update
-			if(angularDelta > 3.1416f) angularDelta = (float) ((2.0 * Math.PI) - angularDelta);
+			//find the angular change in radians from last update
+			angularDelta = Math.abs(currentTheta - previousTheta); 
+			if(angularDelta > Math.PI) //adjust for crossing PI
+				angularDelta = (float) ((2.0 * Math.PI) - angularDelta);
 			
-			
-			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
-			
-			spindle.setRotation((float) -(currentTheta * 180 / Math.PI) - 40.0f);
-			
+			//rotate the image of the spindle and then draw it
+			spindle.setRotation((float) (currentTheta * 180 / Math.PI) - 40.0f);
 			drawSprites();
 			
+			//TODO: vibrate the phone!
+			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
+			
+			//move the catch closer and see if we caught it yet
 			distance -= angularDelta; //TODO: scale this with testing? possibly take the rod into account.
-			if (distance <= 0) success();
+			if (distance <= 0) 
+				success();
 			
 			//updating these for next cycle through.
 			previousTheta = currentTheta; 
@@ -299,13 +317,20 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) { }
 	
-
+	/**
+	 * Called once the MySurfaceView is ready. Draw our sprites ASAP
+	 * 
+	 * @param holder
+	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		drawSprites();
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) { }
 
+	/**
+	 * Tell the surface to draw sprites if it is valid
+	 */
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
 	        Canvas canvas = holder.lockCanvas();
