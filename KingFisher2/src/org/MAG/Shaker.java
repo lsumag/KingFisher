@@ -31,6 +31,9 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
 	
+	//the king you caught.
+	private CatchableObject caught;
+	
 	//sprites to draw on foreground
 	private Sprite king, coinPile, fallingLoot;
 	
@@ -44,8 +47,6 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	
 	private int timbersShivered; //a counter for how many times the user has shaken the king
 	
-	private int catchID; //TODO: used to determine which king we will draw. add logic for more kings later.
-	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
@@ -54,17 +55,11 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		setContentView(R.layout.shaker);
-		
-		Bundle extras = getIntent().getExtras(); 
-        if(extras !=null) {
-            catchID = extras.getInt("CatchID");
-            Log.d(TAG, "Catch ID: " + catchID);
-        }
         
         foreground = (MySurfaceView)findViewById(R.id.shaker_foreground);
         
-        //TODO: these are hardcoded right now. we could easily create a list up at the top and look up which drawables and names to use based on that.
-        king = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+        caught = Reeler.getCatch();
+        king = caught.getSprite();
         coinPile = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile1), 0.5f, 1.0f, 0, Sprite.ALIGNMENT_BOTTOM);
         
         foreground.addSprite(king);
@@ -116,6 +111,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         	SoundManager.playSound(1, 1);
         	
         	//beat up the king, make him drop treasure based on how many shakes we've done.
+        	//TODO: we should look up the drawables based on which level we're on.
         	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview. we need falling coins now. rotate the king a bit more.
         	case 5:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
@@ -143,12 +139,10 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         	case 20:
         		sensorManager.unregisterListener(this);
         		holder.removeCallback(this);
-        		//TODO: bundle up which king was caught and send it along! we also need the levelID still.
         		
         		//Launch the next activity! Throw the king back.
         		try {
                 	Intent ourIntent = new Intent(Shaker.this, Class.forName("org.MAG.Rejecterator"));
-                	ourIntent.putExtra("CatchID", catchID);
                 	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         			startActivity(ourIntent);
         			finish();
@@ -189,5 +183,4 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	        holder.unlockCanvasAndPost(canvas);
         }
 	}
-	
 }

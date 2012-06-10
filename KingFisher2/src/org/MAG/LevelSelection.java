@@ -45,7 +45,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	
 	private SharedPreferences settings;
 	
-	private int selectedLevel;
+	private static int selectedLevel;
 	
 	/**
 	 * Called at activity start. Grab our preferences for selected level, load up sounds from the manager, populate a horizontal pager with level selections
@@ -106,6 +106,10 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         //TODO: launch instructional audio thread - something like "swipe left and right to change levels. shake on it to confirm."
     }
 	
+	public static int getLevel() {
+		return selectedLevel;
+	}
+	
 	@Override
 	public void onPause() {
 		if (sensorManager != null) sensorManager.unregisterListener(this);
@@ -156,8 +160,6 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         		//Launch the next Activity - TravelScene
         		try {
                 	Intent ourIntent = new Intent(LevelSelection.this, Class.forName("org.MAG.TravelScene"));
-                	ourIntent.putExtra("SelectedLevel", selectedLevel);
-                	
                 	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         			startActivity(ourIntent);
         			sensorManager.unregisterListener(this);

@@ -23,7 +23,7 @@ public class Rejecterator extends Activity implements SensorEventListener {
 	
 	private boolean rejected;
 	
-	private int catchID;
+	private CatchableObject caught;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,12 +34,7 @@ public class Rejecterator extends Activity implements SensorEventListener {
 		
 		setContentView(R.layout.rejecterator);
 		
-		//TODO: look for the ID in the bundle. we'll need to know what we're throwing away to draw it and play audio.
-		Bundle extras = getIntent().getExtras(); 
-        if(extras !=null) {
-            catchID = extras.getInt("CatchID");
-            Log.d(TAG, "Catch ID: " + catchID);
-        }		
+		caught = Reeler.getCatch();
 		
 		Log.e("KingFisher", "made the Rejecterator");
 		

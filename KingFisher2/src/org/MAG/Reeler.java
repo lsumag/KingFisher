@@ -1,10 +1,12 @@
 package org.MAG;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -40,6 +42,8 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private WaitForHookTask waitTask; //AsyncTask - while waiting for a bite
 	private StruggleTask struggleTask; //AsyncTask - working against player while reeling
 	
+	private SharedPreferences settings;
+	
 	private Random random; //Random to determine what hooks on the line
 	
 	//For determining where a touch is on the screen relative to the center. Cartesian -> Polar
@@ -57,9 +61,17 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private boolean fingerDown;
 	
 	//Passed in from Caster activity or calculated (at least partially) from that
-	private int levelID, catchID; //from Bundle.
-	private float distance = 100;
-	private float lineStrength = 100; //TODO: set these onCreate based on the line you have and the quality of the cast. we should have something about your hook and rod, too.
+	private int levelID; //from Bundle.
+	private float distance = 100; //how far you have cast the hook. also the distance you have to reel in.
+	private float lineStrength; //essentially health of your fishing line. depends on the quality of line you have.
+	
+	
+	private ArrayList<CatchableObject> level0, level1, level2, level3;
+	
+	private ArrayList<ArrayList<CatchableObject>> pool;
+	
+	private static CatchableObject hookedObject;
+	
 	
 	/**
 	 * Called on Activity creation. Set the background, touch listener, vibrator, load up sounds.
@@ -70,12 +82,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        Bundle extras = getIntent().getExtras(); 
-        if(extras !=null) {
-            distance = extras.getInt("CastDistance");
-            levelID = extras.getInt("SelectedSelected");
-            Log.d(TAG, "Selected Level ID: " + levelID + ", Cast Distance: " + distance);
-        }
+        settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
+        
+        lineStrength = settings.getInt("LineStrength", 100);
+        
+        fillPool();
         
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -116,16 +127,62 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         waitTask.execute();
     }
 	
+	public static CatchableObject getCatch() {
+		return hookedObject;
+	}
+	
+	//TODO: populate these now! add more assets in when we can.
+	private void fillPool() {
+		
+		Sprite napoleonSprite = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+		Sprite bootSprite = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.catch_boot), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+		Sprite eelSprite = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.catch_eel), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+		Sprite tireSprite = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.catch_tire), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);
+		CatchableObject boot = new CatchableObject(bootSprite, 5, 2000, 0, 500, false);
+		CatchableObject eel = new CatchableObject(eelSprite, 5, 2000, 50, 500, false);
+		CatchableObject tire = new CatchableObject(tireSprite, 5, 2000, 0, 500, false);
+		CatchableObject napoleon = new CatchableObject(napoleonSprite, 5, 2000, 50, 500, true);
+		
+		level0 = new ArrayList<CatchableObject>();
+		level0.add(boot);
+		level0.add(tire);
+		level0.add(eel);
+		level0.add(napoleon);
+		
+		level1 = new ArrayList<CatchableObject>();
+		level1.add(boot);
+		level1.add(tire);
+		level1.add(eel);
+		
+		level2 = new ArrayList<CatchableObject>();
+		level2.add(boot);
+		level2.add(tire);
+		level2.add(eel);
+		
+		level3 = new ArrayList<CatchableObject>();
+		level3.add(boot);
+		level3.add(tire);
+		level3.add(eel);
+		
+		pool = new ArrayList<ArrayList<CatchableObject>>();
+		pool.add(level0);
+		pool.add(level1);
+		pool.add(level2);
+		pool.add(level3);
+	}
+
 	/**
 	 * We've waited and hooked something! Allow the player to start reeling in and have the fish/king struggle
 	 */
-	private void hook() {
-		Log.e(TAG, "HOOK!");
-		
+	private void hook() {		
 		vibrotron.vibrate(500);
 		SoundManager.playSound(2, 1);
 		
-		//TODO: determine what it is we've hooked based on random numbers, your bait, the current level ID, and distance of the cast.
+		//TODO: check for null.
+		int randomInt = random.nextInt(pool.get(levelID).size());
+		hookedObject = pool.get(LevelSelection.getLevel()).get(randomInt);
+		Log.d(TAG, "" + randomInt);
+		
 		background.setOnTouchListener(this);
 		struggleTask = new StruggleTask();
 		struggleTask.execute();
@@ -135,27 +192,31 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 * You caught something!
 	 */
 	private void success() {
-		
-		//TODO: go to the Catcher next. it will decide what to do from there. it will need the level ID and the catch ID
-		
 		if (struggleTask != null) struggleTask.cancel(true);
 		Log.e(TAG, "SUCCESS!");
 		background.setOnTouchListener(null);
 		holder.removeCallback(this);
 		
-		//TODO: we're going to launch the next activity based on what was caught. if it was junk, rejecterator. if it was a king, shaker.
-		//TODO: bundle up the catch's ID and ship it off to the next intent.
-		
-		try {
-        	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Shaker"));
-        	ourIntent.putExtra("CatchID", catchID);
-        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(ourIntent);
-			finish();
-		} catch (ClassNotFoundException ex) {
-			Log.e(TAG, "Failed to jump to another activity");
+		if (hookedObject.isKing()) {
+			try {
+	        	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Shaker"));
+	        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(ourIntent);
+				finish();
+			} catch (ClassNotFoundException ex) {
+				Log.e(TAG, "Failed to jump to another activity");
+			}
 		}
-		
+		else {
+			try {
+	        	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Rejecterator"));
+	        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(ourIntent);
+				finish();
+			} catch (ClassNotFoundException ex) {
+				Log.e(TAG, "Failed to jump to another activity");
+			}
+		}
 	}
 	
 	/**
@@ -169,7 +230,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		
 		try {
         	Intent ourIntent = new Intent(Reeler.this, Class.forName("org.MAG.Caster"));
-        	ourIntent.putExtra("SelectedLevel", levelID);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(ourIntent);
 			finish();
@@ -223,11 +283,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		protected Boolean doInBackground(Void... params) {
 			while (true) {
 				try {
-					Thread.sleep(1000); //TODO: time should depend on what you've hooked. This is how often whatever is hooked will struggle.
+					Thread.sleep(hookedObject.getStruggleDelay());
 					vibrotron.vibrate(300);
 					
-					//TODO: fish line break attempt. damage the line based on level difficulty
-					if (!fingerDown) distance += 5; //TODO: depends upon what's hooked as well. you should hold down to prevent the fish from unreeling itself.
+					if (fingerDown) lineStrength -= hookedObject.getStrength(); //based on what is hooked.
+					else distance += hookedObject.getStrength(); //depends upon what's hooked as well. you should hold down to prevent the fish from unreeling itself. will protect line from damage, though.
 					
 					if (lineStrength <= 0) return true;
 				} catch (InterruptedException e) {

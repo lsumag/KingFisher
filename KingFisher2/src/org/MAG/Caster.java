@@ -33,10 +33,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private ImageView casterBackground;
 	//TODO: we may need an overlay for sprites
 	
-	private int levelID;
 	private int castDistance = 100; //TODO: change from 100 by default.
-	
-	//TODO: we need a way to keep track of the quality of the cast.
 	
 	/**
 	 * Initiate the Caster Activity, load the sounds up, set up touch listener, vibrator, sensor manager, and accelerometer sensor
@@ -46,12 +43,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        Bundle extras = getIntent().getExtras(); 
-        if(extras !=null) {
-            levelID = extras.getInt("SelectedLevel");
-            Log.d(TAG, "Selected Level ID: " + levelID);
-        }
         
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -142,7 +133,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					//Free up listeners, hardware, etc. and launch the Reeler Activity.
 					try {
 			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
-			        	ourIntent.putExtra("SelectedLevel", levelID);
 			        	ourIntent.putExtra("CastDistance", castDistance);
 			        	sensorManager.unregisterListener(this);
 			        	vibrotron = null;

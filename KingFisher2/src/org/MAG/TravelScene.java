@@ -43,11 +43,7 @@ public class TravelScene extends Activity implements OnTouchListener, OnCompleti
         
 		setContentView(R.layout.travel);
         
-		Bundle extras = getIntent().getExtras(); 
-        if(extras !=null) {
-            levelID = extras.getInt("SelectedLevel");
-            Log.d(TAG, "Selected Level ID: " + levelID);
-        }
+        levelID = LevelSelection.getLevel();
 		
         //TODO: redo the travel video and include audio in it as well.
 		
@@ -95,7 +91,6 @@ public class TravelScene extends Activity implements OnTouchListener, OnCompleti
 		try {
 			travel.stopPlayback();
         	Intent ourIntent = new Intent(TravelScene.this, Class.forName("org.MAG.Caster"));
-        	ourIntent.putExtra("SelectedLevel", levelID);
         	travel.setOnTouchListener(null);
         	travel.setOnCompletionListener(null);
         	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
