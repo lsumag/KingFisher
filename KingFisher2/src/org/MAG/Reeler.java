@@ -296,8 +296,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			spindle.setRotation((float) (currentTheta * 180 / Math.PI) - 40.0f);
 			drawSprites();
 			
-			//TODO: vibrate the phone!
 			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
+			
+			//TODO: change how often this is played based on the rate of reeling. we might also want to have the line take damage if too fast. warning audio, too.
+			SoundManager.playSound(4, 0.7f);
+			vibrotron.vibrate(50);
 			
 			//move the catch closer and see if we caught it yet
 			distance -= angularDelta; //TODO: scale this with testing? possibly take the rod into account.

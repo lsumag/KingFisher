@@ -31,6 +31,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private final long[] castPattern = {0, 50, 50, 50, 50, 50, 50, 50, 50};
 	
 	private ImageView casterBackground;
+	//TODO: we may need an overlay for sprites
 	
 	private int levelID;
 	private int castDistance = 100; //TODO: change from 100 by default.
@@ -80,7 +81,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
-		
         SoundManager.loadSounds(SoundManager.CASTABLE);
 		
         //TODO: wait for a few seconds, then play the sound.
@@ -115,8 +115,11 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	 */
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
-	
 	/** TODO: wait for the cast gesture to finish before deciding on a castDistance value to send.
+	 * Let's try this: touch lets us listen for the event to start. Register the listener on touch down, unregister on up.
+	 * Set a threshold to let the event start. Track readings over time and sum it up.
+	 * Event ending: touch up or readings below a threshold.
+	 * 
 	 * Called when a sensor gets a read. This will happen a LOT. Determine if the user has casted the rod here.
 	 * 
 	 * @param event the event that we received from hardware. use event.values to find x, y, and z readings. note: this is also just the accelerometer
