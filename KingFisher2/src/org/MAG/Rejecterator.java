@@ -80,9 +80,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 		//TODO: wait, then "throw it back"
 	}
 	
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// Yeah, well, you know, that's just like, your opinion, man.
-	}
+	public void onAccuracyChanged(Sensor sensor, int accuracy) { /* Yeah, well, you know, that's just like, your opinion, man. */ }
 
 	/**TODO: we might want to make sure this is good enough. maybe a delay after loading up the activity before we start listening
 	 * Users sometimes entirely missed the rejecterator because they were still shaking the king down for treasure.

@@ -26,8 +26,6 @@ public class TravelScene extends Activity implements OnTouchListener, OnCompleti
 	
 	private VideoView travel;
 	
-	private int levelID;
-	
 	/**
 	 * Called on Activity creation. set the background and video, media player and completion listener
 	 * 
@@ -40,15 +38,14 @@ public class TravelScene extends Activity implements OnTouchListener, OnCompleti
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
-		setContentView(R.layout.travel);
-        
-        levelID = LevelSelection.getLevel();
 		
         //TODO: redo the travel video and include audio in it as well.
 		
+		setContentView(R.layout.travel);
+		
         travel = (VideoView)findViewById(R.id.travel_background);
         
+        Log.d(TAG, "travel null? " + (travel == null));
         travel.setOnTouchListener(this);
         Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.travel);
         
