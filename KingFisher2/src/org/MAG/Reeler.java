@@ -218,7 +218,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		protected Boolean doInBackground(Void... params) {
 			while (true) {
 				try {
-					Thread.sleep(1000); //TODO: time should depend on what you've hooked.
+					Thread.sleep(1000); //TODO: time should depend on what you've hooked. This is how often whatever is hooked will struggle.
 					vibrotron.vibrate(300);
 					
 					//TODO: fish line break attempt. damage the line based on level difficulty
@@ -233,18 +233,20 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		
 		@Override
 		protected void onPostExecute(Boolean escape) {
-			if (escape) recast(); //the fish has broken the line and escaped. cast again.
+			if (escape) recast(); //The line was broken. Cast again.
 		}
 	}
 	
-	public void onDestroy() {
+	public void onPause() {
 		if (waitTask != null) waitTask.cancel(true);
 		if (struggleTask != null) struggleTask.cancel(true);
-		super.onDestroy();
+		super.onPause();
 	}
 	
 	public boolean onTouch(View v, MotionEvent event) {
-		event.offsetLocation(minusHalfWidth, minusHalfHeight); //offset our touch location. it is now relative to the center of the screen.
+		
+		//offset our touch location. it is now relative to the center of the screen.
+		event.offsetLocation(minusHalfWidth, minusHalfHeight);
 		x = event.getX(0);
 		y = event.getY(0);
 		
@@ -254,19 +256,15 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			previousRadius = (float) Math.sqrt( x * x + y * y ); //Euclidean distance of touch from center of screen
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
-			spindle.setRotation((float) (previousTheta * 180 / Math.PI));
+			//NOTE: -40.0f is because our image isn't quite aligned on the x-axis
+			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
 			
 			drawSprites();
 			
 			fingerDown = true;
 			
-			Log.d(TAG, "finger down.");
-			
 			break;
 		case MotionEvent.ACTION_MOVE:
-			
-			//TODO: let's just remove the delta from the fish distance as we reel. fishDistance -= (currentTheta - previousTheta)/(Math.PI*100) or something like that.
-			
 			
 			currentRadius = (float) Math.sqrt( x * x + y * y ); //distance of the touch from center of the screen
 			
@@ -279,13 +277,13 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			if(angularDelta > 3.1416f) angularDelta = (float) ((2.0 * Math.PI) - angularDelta);
 			
 			
-			Log.e(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
+			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
 			
-			spindle.setRotation((float) -(currentTheta * 180 / Math.PI));
+			spindle.setRotation((float) -(currentTheta * 180 / Math.PI) - 40.0f);
 			
 			drawSprites();
 			
-			distance -= angularDelta;
+			distance -= angularDelta; //TODO: scale this with testing? possibly take the rod into account.
 			if (distance <= 0) success();
 			
 			//updating these for next cycle through.
@@ -294,7 +292,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			break;
 		case MotionEvent.ACTION_UP:
 			fingerDown = false;
-			Log.d(TAG, "finger up.");
 			break;
 		}
 		return true;

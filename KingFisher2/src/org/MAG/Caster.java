@@ -95,14 +95,12 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	 * @param event the MotionEvent that has occurred. 
 	 */
 	public boolean onTouch(View v, MotionEvent event) {
+		
 		switch (event.getAction()) {
 	    case MotionEvent.ACTION_DOWN:
-	    	Log.e("KingFisher", "CASTABLE!!!");
-	    	
 	    	touched = true;
 	    	break;
 	    case MotionEvent.ACTION_UP:
-	    	Log.e("KingFisher", "NOT CASTABLE!!!");
 	    	touched = false;
 	    	break;
 	    }
@@ -130,7 +128,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 				//if the readings are strong enough over the right axes (x and y)...
 				if (event.values[1] < -SensorManager.GRAVITY_EARTH * 1.5 && (Math.abs(event.values[0]) > SensorManager.GRAVITY_EARTH || Math.abs(event.values[2]) > SensorManager.GRAVITY_EARTH)) {
 					//CAST!!!
-					Log.e("KingFisher", "CAST!!!");
 					casting = true;
 					vibrotron.vibrate(castPattern, -1);
 					

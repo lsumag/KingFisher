@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
- * 
+ * The first activity of the application.
  * @author UnderGear
  *
  */

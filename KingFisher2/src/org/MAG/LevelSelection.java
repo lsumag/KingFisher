@@ -9,8 +9,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.SoundPool;
-import android.media.SoundPool.OnLoadCompleteListener;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.view.PagerAdapter;
@@ -23,11 +21,11 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 /**
- * 
+ * This activity is responsible for letting the user select a level to play and then passing that on to the Travel activity.
  * @author UnderGear
  *
  */
-public class LevelSelection extends Activity implements SensorEventListener, OnPageChangeListener, OnLoadCompleteListener {
+public class LevelSelection extends Activity implements SensorEventListener, OnPageChangeListener {
 
 	private static final String TAG = "LevelSelection";
 	
@@ -39,7 +37,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	private final double accelerationThreshold = 2.5f;
 	private double totalAcceleration;
 	
-	private MyViewPager viewPager;
+	private ViewPager viewPager;
 	private MyPagerAdapter pagerAdapter;
 	
 	private static ImageView[] levelScreens = new ImageView[4]; //TODO: we will have 3 images for each level. Locked screen, black silhouette, colored-in king. these correspond to locked levels, unlocked uncompleted levels, and completed levels
@@ -95,7 +93,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         //Setting up horizontal paging here.
         setContentView(R.layout.level_selecter);
         pagerAdapter = new MyPagerAdapter();
-        viewPager = (MyViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(pagerAdapter);
         
         viewPager.setOnPageChangeListener(this);
@@ -105,7 +103,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         
-        //TODO: launch instructional audio thread
+        //TODO: launch instructional audio thread - something like "swipe left and right to change levels. shake on it to confirm."
     }
 	
 	@Override
@@ -120,7 +118,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 		
 		//Load up the sounds for the LevelSelection Activity!
-        //SoundManager.loadSounds(SoundManager.LEVEL);
+        SoundManager.loadSounds(SoundManager.LEVEL);
 		
 	}
 
@@ -170,16 +168,15 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
         	}
         	//The selected level is not unlocked.
         	else {
-        		//TODO: if not available, vibrate "no" pattern. two buzzes in quick succession?
+        		//TODO: if not available, vibrate "no" pattern. two buzzes in quick succession? play something like "you're not skilled enough to go here just yet"
         	}
         }
-        
         //set last acceleration to current read.
         totalPreviousAcceleration = totalAcceleration;
 	}
 	
 	/**
-	 * 
+	 * PagerAdapter for our Horizontal Pager.
 	 * @author UnderGear
 	 *
 	 */
@@ -212,13 +209,6 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
 	public void onPageSelected(int position) {
-		Log.d(TAG, ""+position);
-		
 		selectedLevel = position;
-	}
-
-	public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-		Log.d(TAG, "soundpool loaded");
-		
 	}
 }
