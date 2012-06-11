@@ -2,6 +2,8 @@ package org.MAG;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
@@ -34,12 +36,16 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	private CatchableObject caught;
 	private Sprite caughtSprite;
 	
+	private SharedPreferences settings;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
+		settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
 		
 		setContentView(R.layout.rejecterator);
 		
@@ -92,21 +98,38 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 			if (event.values[1] < -SensorManager.GRAVITY_EARTH * 1.5 && (Math.abs(event.values[0]) > SensorManager.GRAVITY_EARTH * 1.5 || Math.abs(event.values[2]) > SensorManager.GRAVITY_EARTH * 1.5)) {
 				rejected = true;
 				
-				Log.e("KingFisher", "Throw him in the river!");
+				Log.d("KingFisher", "Throw him in the river!");
+				sensorManager.unregisterListener(this);
 				
 				//TODO: asynctask to shrink, move, and rotate the sprite we're throwing back.
-				
+				//TODO: jump to next activity!
 				vibrotron.vibrate(1500);
-				if (caught.isKing())
+				if (caught.isKing()) {
 					SoundManager.playSound(1, 1);
-				else
+					
+					settings.edit().putInt("level"+LevelSelection.getLevel(), LevelSelection.LEVEL_COMPLETE).commit();
+					settings.edit().putInt("level"+(LevelSelection.getLevel()+1), LevelSelection.LEVEL_UNLOCKED).commit();
+					
+					Log.d(TAG, "level " + LevelSelection.getLevel() + " completed");
+					
+					if (LevelSelection.getLevel() + 1 <= 3) {
+						Log.d(TAG, "level " + (LevelSelection.getLevel() + 1) + " unlocked");
+						LevelSelection.setLevel(LevelSelection.getLevel() + 1);
+					}
+				}
+				else {
 					SoundManager.playSound(2, 1);
+				}
 				
-				sensorManager.unregisterListener(this);
-				//SoundManager.playJesterSound(1, 1);
-				//Log.e("KingFisher", "X: "+ event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
+				try {
+                	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.LevelSelection"));
+                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        			startActivity(ourIntent);
+        			finish();
+        		} catch (ClassNotFoundException ex) {
+        			Log.e(TAG, "Failed to jump to another activity");
+        		}
 				
-				//TODO: play animation, jump to next activity!
 			}
 		}
 	}

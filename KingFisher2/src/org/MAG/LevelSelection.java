@@ -29,6 +29,10 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 
 	private static final String TAG = "LevelSelection";
 	
+	public static final int LEVEL_LOCKED = 0;
+	public static final int LEVEL_UNLOCKED = 1;
+	public static final int LEVEL_COMPLETE = 2;
+	
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -62,30 +66,39 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
-        //Level 0 is always unlocked and selected.
-        levelScreens[0] = new ImageView(this);
-        levelScreens[0].setBackgroundResource(R.drawable.napoleon_level); //Napoleon silhouette
-        levelStatus[0] = 1;
-        
         //Level lock/unlocked statuses are kept in preferences.
         settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
         
+        levelScreens[0] = new ImageView(this);
+        
+        levelStatus[0] = settings.getInt("level0", LEVEL_UNLOCKED);
+        if (levelStatus[0] == LEVEL_UNLOCKED) {
+        	levelScreens[0].setBackgroundResource(R.drawable.napoleon_level);
+        }
+        else
+        	levelScreens[0].setBackgroundResource(R.drawable.napoleon_sprite4);
+        
         //Determine which levels are unlocked. Each should have a corresponding locked vs unlocked background that we are setting here.
         for (int i = 1; i < levelScreens.length; i++) {
+        	
+        	
+        	
         	levelScreens[i] = new ImageView(this);
-        	levelStatus[i] = settings.getInt("level"+i+1, 0);
+        	levelStatus[i] = settings.getInt("level"+i, LEVEL_LOCKED);
+        	
+        	Log.d(TAG, "level " + i + ": " + levelStatus[i]);
         	
         	//Set background.
         	//TODO: look up correct backgrounds. we should probably do this with 3 arrays and just look up the right thing by index.
         	switch (levelStatus[i]) {
-        	case 0:
+        	case LEVEL_LOCKED:
         		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_56); //lockedBackgrounds[i]
         		break;
-        	case 1:
+        	case LEVEL_UNLOCKED:
         		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32); //unlockedBackgrounds[i]
         		break;
-        	case 2:
-        		levelScreens[i].setBackgroundResource(R.drawable.cast2_animation_32); //completedBackgrounds[i]
+        	case LEVEL_COMPLETE:
+        		levelScreens[i].setBackgroundResource(R.drawable.napoleon_sprite4); //completedBackgrounds[i]
         		break;
         	}
         }
@@ -103,11 +116,18 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         
+        //set the viewpager to the selected level - mostly used if we're returning to level selection from a catch
+        viewPager.setCurrentItem(selectedLevel);
+        
         //TODO: launch instructional audio thread - something like "swipe left and right to change levels. shake on it to confirm."
     }
 	
 	public static int getLevel() {
 		return selectedLevel;
+	}
+	
+	public static void setLevel(int level) {
+		selectedLevel = level;
 	}
 	
 	@Override
@@ -212,5 +232,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 
 	public void onPageSelected(int position) {
 		selectedLevel = position;
+		vibrotron.vibrate(50);
+		//TODO: swap audio task here.
 	}
 }

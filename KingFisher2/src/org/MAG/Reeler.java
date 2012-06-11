@@ -61,7 +61,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private boolean fingerDown;
 	
 	//Passed in from Caster activity or calculated (at least partially) from that
-	private int levelID; //from Bundle.
 	private float distance = 100; //how far you have cast the hook. also the distance you have to reel in.
 	private float lineStrength; //essentially health of your fishing line. depends on the quality of line you have.
 	
@@ -178,8 +177,8 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		vibrotron.vibrate(500);
 		SoundManager.playSound(2, 1);
 		
-		//TODO: check for null.
-		int randomInt = random.nextInt(pool.get(levelID).size());
+		int randomInt = random.nextInt(pool.get(LevelSelection.getLevel()).size());
+		
 		hookedObject = pool.get(LevelSelection.getLevel()).get(randomInt);
 		Log.d(TAG, "" + randomInt);
 		

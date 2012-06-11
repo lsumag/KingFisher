@@ -45,7 +45,6 @@ public class TravelScene extends Activity implements OnTouchListener, OnCompleti
 		
         travel = (VideoView)findViewById(R.id.travel_background);
         
-        Log.d(TAG, "travel null? " + (travel == null));
         travel.setOnTouchListener(this);
         Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.travel);
         
