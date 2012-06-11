@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -37,6 +38,8 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	private Sprite caughtSprite;
 	
 	private SharedPreferences settings;
+	
+	private AudioTask audioTask;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,6 +78,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	@Override
 	public void onPause() {
 		sensorManager.unregisterListener(this);
+		if (audioTask != null) audioTask.cancel(true);
 		super.onPause();
 	}
 	
@@ -83,7 +87,8 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
-		//TODO: wait, then "throw it back"
+		audioTask = new AudioTask();
+		audioTask.execute();
 	}
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { /* Yeah, well, you know, that's just like, your opinion, man. */ }
@@ -103,17 +108,19 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 				
 				//TODO: asynctask to shrink, move, and rotate the sprite we're throwing back.
 				//TODO: jump to next activity!
-				vibrotron.vibrate(1500);
+				vibrotron.vibrate(1000);
 				if (caught.isKing()) {
 					SoundManager.playSound(1, 1);
 					
+					//this level is now complete.
 					settings.edit().putInt("level"+LevelSelection.getLevel(), LevelSelection.LEVEL_COMPLETE).commit();
-					settings.edit().putInt("level"+(LevelSelection.getLevel()+1), LevelSelection.LEVEL_UNLOCKED).commit();
 					
-					Log.d(TAG, "level " + LevelSelection.getLevel() + " completed");
+					//if the next level is locked, set it to unlocked
+					if (settings.getInt("level"+(LevelSelection.getLevel()+1), LevelSelection.LEVEL_LOCKED) == LevelSelection.LEVEL_LOCKED)
+						settings.edit().putInt("level"+(LevelSelection.getLevel()+1), LevelSelection.LEVEL_UNLOCKED).commit();
 					
+					//setting the selected level to the next one IF it exists!
 					if (LevelSelection.getLevel() + 1 <= 3) {
-						Log.d(TAG, "level " + (LevelSelection.getLevel() + 1) + " unlocked");
 						LevelSelection.setLevel(LevelSelection.getLevel() + 1);
 					}
 				}
@@ -121,7 +128,11 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 					SoundManager.playSound(2, 1);
 				}
 				
-				try {
+				//TODO: audio - "let's go back to the docks." or "let's try to catch something better."
+				if (audioTask != null) audioTask.cancel(true);
+				
+				
+				try { //TODO: maybe we should go back to the casting activity if we didn't catch the king.
                 	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.LevelSelection"));
                 	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         			startActivity(ourIntent);
@@ -151,5 +162,35 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
         }
+	}
+	
+	/**
+	 * Task to handle the narrator giving instructions to the player
+	 * @author undergear
+	 *
+	 */
+	private class AudioTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				Log.e(TAG, e1.getMessage());
+			}
+			//"throw it back"
+			SoundManager.playSound(6, 1);
+			
+			while (true) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					Log.e(TAG, e.getMessage());
+				}
+				//"throw it back"
+				SoundManager.playSound(6, 1);
+			}
+		}
 	}
 }

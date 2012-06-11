@@ -109,6 +109,7 @@ public class SoundManager {
 			break;
 		case SHAKABLE: //coins, loot, king whining
 			mSoundPoolMap.put(1, mSoundPool.load(mContext, R.raw.coinsmall, 1));
+			mSoundPoolMap.put(2, mSoundPool.load(mContext, R.raw.napoleon_plunder, 1));
 			break;
 		case FLINGABLE: //king yelling, splash
 			mSoundPoolMap.put(6, mSoundPool.load(mContext, R.raw.throw_it_back ,1));

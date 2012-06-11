@@ -41,6 +41,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	
 	private WaitForHookTask waitTask; //AsyncTask - while waiting for a bite
 	private StruggleTask struggleTask; //AsyncTask - working against player while reeling
+	private AudioTask audioTask; //AsyncTask - monitor progress and deliver feedback to the player via audio
 	
 	private SharedPreferences settings;
 	
@@ -85,6 +86,8 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         
         lineStrength = settings.getInt("LineStrength", 100);
         
+        audioTask = new AudioTask();
+        
         fillPool();
         
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -112,7 +115,6 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         
         random = new Random();
         
-        //TODO: instructional audio - waiting/patience
         foreground.getHolder().setFormat(PixelFormat.TRANSPARENT);
         foreground.setZOrderOnTop(true);
         
@@ -125,6 +127,12 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         waitTask = new WaitForHookTask();
         waitTask.execute();
     }
+	
+	public void onResume() {
+		audioTask.execute();
+		
+		super.onResume();
+	}
 	
 	public static CatchableObject getCatch() {
 		return hookedObject;
@@ -175,7 +183,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 */
 	private void hook() {		
 		vibrotron.vibrate(500);
-		SoundManager.playSound(2, 1);
+		SoundManager.playSound(2, 1); //TODO: notify audio task
 		
 		int randomInt = random.nextInt(pool.get(LevelSelection.getLevel()).size());
 		
@@ -195,6 +203,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		Log.e(TAG, "SUCCESS!");
 		background.setOnTouchListener(null);
 		holder.removeCallback(this);
+		if (audioTask != null) audioTask.cancel(true);
 		
 		if (hookedObject.isKing()) {
 			try {
@@ -223,7 +232,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 */
 	private void recast() {
 		Log.e(TAG, "RECAST!");
-		
+		if (audioTask != null) audioTask.cancel(true);
 		background.setOnTouchListener(null);
 		holder.removeCallback(this);
 		
@@ -268,7 +277,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		}
 	}
 	
-	/**
+	/** TODO: notify audioTask of counter-progress done here
 	 * AsyncTask for the fish's escape attempts after getting hooked on the line
 	 * @author undergear
 	 *
@@ -309,10 +318,20 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	public void onPause() {
 		if (waitTask != null) waitTask.cancel(true);
 		if (struggleTask != null) struggleTask.cancel(true);
+		if (audioTask != null) audioTask.cancel(true);
 		super.onPause();
 	}
 	
-	/**
+	private class AudioTask extends AsyncTask<Void, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			// TODO: audio logic goes here
+			return null;
+		}
+	}
+	
+	/** TODO: notify audioTask of progress made here.
 	 * The user has touched the screen
 	 * 
 	 * @param v view touched

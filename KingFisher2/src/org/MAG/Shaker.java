@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -47,6 +48,8 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	
 	private int timbersShivered; //a counter for how many times the user has shaken the king
 	
+	private AudioTask audioTask;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
@@ -68,7 +71,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         holder.setFormat(PixelFormat.TRANSPARENT);
         
         holder.addCallback(this);
-		
+        
 		SoundManager.loadSounds(SoundManager.SHAKABLE);
 		
 		vibrotron = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -83,6 +86,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	public void onPause() {
 		sensorManager.unregisterListener(this);
 		holder.removeCallback(this);
+		if (audioTask != null) audioTask.cancel(true);
 		super.onPause();
 	}
 	
@@ -91,7 +95,8 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 		super.onResume();
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
-		//TODO: wait, then "shake him down for the plunder!"
+		audioTask = new AudioTask();
+		audioTask.execute();
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
@@ -139,7 +144,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         	case 20:
         		sensorManager.unregisterListener(this);
         		holder.removeCallback(this);
-        		
+        		audioTask.cancel(true);
         		//Launch the next activity! Throw the king back.
         		try {
                 	Intent ourIntent = new Intent(Shaker.this, Class.forName("org.MAG.Rejecterator"));
@@ -182,5 +187,41 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
         }
+	}
+	
+	/**
+	 * Task to handle the narrator giving instructions to the player
+	 * @author undergear
+	 *
+	 */
+	private class AudioTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				Log.e(TAG, e1.getMessage());
+			}
+			
+			//TODO: based on the level, play audio!
+			switch (LevelSelection.getLevel()) {
+			case 0:
+				SoundManager.playSound(2, 1);
+				break;
+			default:
+				break;
+			}
+			
+			while (true) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					Log.e(TAG, e.getMessage());
+				}
+				//TODO: play audio instructions here.
+			}
+		}
 	}
 }

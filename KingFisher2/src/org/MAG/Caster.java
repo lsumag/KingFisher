@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private ImageView casterBackground;
 	//TODO: we may need an overlay for sprites
 	
+	private AudioTask audioTask;
+	
 	private int castDistance = 100; //TODO: change from 100 by default.
 	
 	/**
@@ -53,7 +56,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         casterBackground = (ImageView)findViewById(R.id.caster_background);
         casterBackground.setOnTouchListener(this);
         
-        //TODO: instructional audio - tell the user how to cast!
+        audioTask = new AudioTask();
         
         //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -64,6 +67,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	@Override
 	public void onPause() {
 		if (sensorManager != null) sensorManager.unregisterListener(this);
+		if (audioTask != null) audioTask.cancel(true);
 		super.onPause();
 	}
 	
@@ -74,8 +78,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		
         SoundManager.loadSounds(SoundManager.CASTABLE);
 		
-        //TODO: wait for a few seconds, then play the sound.
-		//SoundManager.playSound(2, 1);
+        audioTask.execute();
 	}
 
 	/**
@@ -127,6 +130,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 					
 					//play the casting audio.
 					SoundManager.playSound(1, 1);
+					if (audioTask != null) audioTask.cancel(true);
 					
 					//TODO: launch the cast animation, wait for it to finish before doing the following try block
 					
@@ -148,5 +152,34 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 			}
 		}
 		else casting = false;
+	}
+	
+	/**
+	 * Task to handle the narrator giving instructions to the player
+	 * @author undergear
+	 *
+	 */
+	private class AudioTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				Log.e(TAG, e1.getMessage());
+			}
+			//"cast away!"
+			SoundManager.playSound(2, 1);
+			
+			while (true) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					Log.e(TAG, e.getMessage());
+				}
+				//TODO: play audio instructions here.
+			}
+		}
 	}
 }
