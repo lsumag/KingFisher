@@ -74,16 +74,13 @@ public class MySurfaceView extends SurfaceView {
 					
 					matrix.postRotate(sprite.getRotation(), sprite.getImage().getWidth() * sprite.getAlignX(), sprite.getImage().getHeight() * sprite.getAlignY());
 					
-					//matrix.postRotate(sprite.getRotation());
-					
-					//Rotated bitmap. Its size is different from the original. NOTE: DO NOT overwrite the sprite's bitmap with this rotated one.
-					Bitmap rotatedBMP = Bitmap.createBitmap(sprite.getImage(), 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), matrix, true);
 					
 					//Same calculation as before, but with the rotated bitmap instead of the original.
-					x = this.getWidth() * sprite.getX() - rotatedBMP.getWidth() * sprite.getAlignX();
-					y = this.getHeight() * sprite.getY() - rotatedBMP.getHeight() * sprite.getAlignY();
+					//x = this.getWidth() * sprite.getX() - rotatedBMP.getWidth() * sprite.getAlignX();
+					//y = this.getHeight() * sprite.getY() - rotatedBMP.getHeight() * sprite.getAlignY();
 					
-					canvas.drawBitmap(rotatedBMP, x, y, paint); //Draw the sprite at our coordinates!
+					//canvas.drawBitmap(rotatedBMP, x, y, paint); //Draw the sprite at our coordinates!
+					canvas.drawBitmap(sprite.getImage(), matrix, paint);
 				}
 			}
 		}

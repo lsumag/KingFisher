@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 /**
@@ -58,6 +60,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private float angularDelta; //Change in radians since last event
 	
 	private Sprite rod, spindle; //to be drawn on the foreground.
+	private RotateAnimation rotateAnimation;
 	
 	private boolean fingerDown;
 	
@@ -351,7 +354,10 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
 			//NOTE: -40.0f is because our image isn't quite aligned on the x-axis
-			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
+			//spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
+			
+			
+			
 			drawSprites();
 			
 			fingerDown = true;
@@ -372,6 +378,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			
 			//rotate the image of the spindle and then draw it
 			spindle.setRotation((float) (currentTheta * 180 / Math.PI) - 40.0f);
+			
 			drawSprites();
 			
 			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
