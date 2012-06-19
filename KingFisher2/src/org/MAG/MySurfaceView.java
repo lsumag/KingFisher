@@ -74,44 +74,13 @@ public class MySurfaceView extends SurfaceView {
 					canvas.drawBitmap(sprite.getImage(), x, y, paint); //Draw the sprite at our coordinates!
 				} else { //The sprite is rotated. We will have to account for this.
 					
-					/**
-					 * TODO: solve this huge problem.
-					 * 
-					 * stage 1: calculate the x and y coordinates of the original sprite - not rotated -> position scale * canvas width + alignment scale * sprite width
-					 * 
-					 * stage 2: set the rotate matrix correctly. the sprite's rotation (in degrees) and the center.
-					 * 
-					 * stage 3: calculate the new x and y coordinates for the rotated sprite - fancy trig?
-					 * 
-					 * stage 4: apply the matrix to the canvas, draw the image at new x and y, remove the matrix
-					 * 
-					 */
-					
-					
-					
 					//Rotation matrix we'll use on the sprite's bitmap
+					
+					//image's rotation, x coordinate of rotation, y coordinate of rotation
+					matrix.setRotate(sprite.getRotation(), this.getWidth() * sprite.getX() + sprite.getImage().getWidth() * (sprite.getAlignX() - 0.5f), sprite.getY() * this.getHeight() + sprite.getImage().getHeight() * (sprite.getAlignY() - 0.5f));
+					
+					canvas.drawBitmap(sprite.getImage(), matrix, paint);
 					matrix.reset();
-					
-					matrix.setRotate(sprite.getRotation(), this.getWidth() * sprite.getX() + sprite.getImage().getWidth() * sprite.getAlignX(), sprite.getY() * this.getHeight() + sprite.getImage().getHeight() * sprite.getAlignY());
-					
-					
-					//Same calculation as before, but with the rotated bitmap instead of the original.
-					//x = this.getWidth() * sprite.getX() - rotatedBMP.getWidth() * sprite.getAlignX();
-					//y = this.getHeight() * sprite.getY() - rotatedBMP.getHeight() * sprite.getAlignY();
-					
-					
-					
-					float rotation = (float) Math.toRadians(sprite.getRotation());
-					
-					x = (float) (x * Math.cos(rotation) + y * -Math.sin(rotation));
-					y = (float) (y * Math.sin(rotation) + y * Math.cos(rotation));
-					
-					Log.d(TAG, "X: " + x + ", Y: " + y);
-					//canvas.drawBitmap(rotatedBMP, x, y, paint); //Draw the sprite at our coordinates!
-					canvas.setMatrix(matrix);
-					//canvas.drawBitmap(sprite.getImage(), matrix, paint);
-					canvas.drawBitmap(sprite.getImage(), x, y, paint);
-					canvas.setMatrix(null);
 				}
 			}
 		}

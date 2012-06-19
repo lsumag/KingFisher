@@ -354,7 +354,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
 			//NOTE: -40.0f is because our image isn't quite aligned on the x-axis
-			//spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
+			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
 			
 			
 			
