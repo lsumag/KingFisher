@@ -22,8 +22,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 /**
@@ -60,12 +58,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private float angularDelta; //Change in radians since last event
 	
 	private Sprite rod, spindle; //to be drawn on the foreground.
-	private RotateAnimation rotateAnimation;
 	
 	private boolean fingerDown;
 	
 	//Passed in from Caster activity or calculated (at least partially) from that
-	private float distance = 100; //how far you have cast the hook. also the distance you have to reel in.
+	private float distance; //how far you have cast the hook. also the distance you have to reel in.
 	private float lineStrength; //essentially health of your fishing line. depends on the quality of line you have.
 	
 	
@@ -88,6 +85,11 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
         
         lineStrength = settings.getInt("LineStrength", 100);
+        
+        Bundle extras = getIntent().getExtras(); 
+        if (extras != null) {
+        	distance = extras.getInt("CastDistance");
+        }
         
         audioTask = new AudioTask();
         
@@ -354,7 +356,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			previousTheta = (float) Math.acos( x / previousRadius ); //angle in radians of the touch relative to center of screen
 			
 			//NOTE: -40.0f is because our image isn't quite aligned on the x-axis
-			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f); //TODO: do we want to just swap background images instead of actually rotating this?
+			spindle.setRotation((float) (previousTheta * 180 / Math.PI) - 40.0f);
 			
 			
 			

@@ -3,14 +3,12 @@ package org.MAG;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceView;
 
 /**
@@ -20,8 +18,6 @@ import android.view.SurfaceView;
  *
  */
 public class MySurfaceView extends SurfaceView {
-
-	private static final String TAG = "MySurfaceView";
 	
 	private ArrayList<Sprite> sprites; //list of the sprites to be drawn on this surface
 	private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG); //this paint will be used to draw each sprite

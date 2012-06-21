@@ -42,9 +42,10 @@ public class ModeSelection extends Activity implements OnTouchListener {
         img.setOnTouchListener(this);
     }
 	
-	private void swipePractice() {
-		//TODO: launch a practice activity
-	}
+	//TODO: launch a practice activity once it exists.
+	/**private void swipePractice() {
+	 
+	}*/
 	
 	private void swipeLevel() {
 		try {

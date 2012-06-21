@@ -1,5 +1,7 @@
 package org.MAG;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,8 +29,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
 	
-	private boolean touched;
-	private boolean casting;
 	private final long[] castPattern = {0, 50, 50, 50, 50, 50, 50, 50, 50};
 	
 	private ImageView casterBackground;
@@ -36,7 +36,10 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	
 	private AudioTask audioTask;
 	
-	private int castDistance = 100; //TODO: change from 100 by default.
+	private boolean casting;
+	private Long lastTimestamp;
+	private ArrayList<SensorEvent> readings;
+	private int castDistance;
 	
 	/**
 	 * Initiate the Caster Activity, load the sounds up, set up touch listener, vibrator, sensor manager, and accelerometer sensor
@@ -53,12 +56,14 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         
         setContentView(R.layout.caster);
         
+        castDistance = 0;
+        
         casterBackground = (ImageView)findViewById(R.id.caster_background);
         casterBackground.setOnTouchListener(this);
         
         audioTask = new AudioTask();
         
-        //TODO: background animation. we'll need 2 layers of SurfaceView and an asynctask
+        //TODO: background animation. we'll need a mysurfaceview
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -74,7 +79,6 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	@Override
 	public void onResume() {
 		super.onResume();
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
         SoundManager.loadSounds(SoundManager.CASTABLE);
 		
@@ -92,10 +96,14 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		
 		switch (event.getAction()) {
 	    case MotionEvent.ACTION_DOWN:
-	    	touched = true;
+	    	casting = true;
+	    	lastTimestamp = System.nanoTime();
+	    	sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+	    	readings = new ArrayList<SensorEvent>();
 	    	break;
 	    case MotionEvent.ACTION_UP:
-	    	touched = false;
+	    	if (casting)
+	    		endCast();
 	    	break;
 	    }
 		return true;
@@ -109,49 +117,66 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	 */
 	public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
-	/** TODO: wait for the cast gesture to finish before deciding on a castDistance value to send.
-	 * Let's try this: touch lets us listen for the event to start. Register the listener on touch down, unregister on up.
-	 * Set a threshold to let the event start. Track readings over time and sum it up.
-	 * Event ending: touch up or readings below a threshold.
-	 * 
-	 * Called when a sensor gets a read. This will happen a LOT. Determine if the user has casted the rod here.
-	 * 
-	 * @param event the event that we received from hardware. use event.values to find x, y, and z readings. note: this is also just the accelerometer
+	
+	/**
+	 * TODO: implement the new approach. find the distance of the cast, then launch the animation, etc.
 	 */
 	public void onSensorChanged(SensorEvent event) {
-		//If the user's finger is on the screen and we're not already casting...
-		if (touched) {
-			if (!casting) {
-				//if the readings are strong enough over the right axes (x and y)...
-				if (event.values[1] < -SensorManager.GRAVITY_EARTH * 1.5 && (Math.abs(event.values[0]) > SensorManager.GRAVITY_EARTH || Math.abs(event.values[2]) > SensorManager.GRAVITY_EARTH)) {
-					//CAST!!!
-					casting = true;
-					vibrotron.vibrate(castPattern, -1);
-					
-					//play the casting audio.
-					SoundManager.playSound(1, 1);
-					if (audioTask != null) audioTask.cancel(true);
-					
-					//TODO: launch the cast animation, wait for it to finish before doing the following try block
-					
-					//Free up listeners, hardware, etc. and launch the Reeler Activity.
-					try {
-			        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
-			        	ourIntent.putExtra("CastDistance", castDistance);
-			        	sensorManager.unregisterListener(this);
-			        	vibrotron = null;
-			        	sensorManager = null;
-			        	casterBackground.setOnTouchListener(null);
-			        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(ourIntent);
-						finish();
-					} catch (ClassNotFoundException ex) {
-						Log.e(TAG, "Failed to jump to another activity");
-					}
-				}
-			}
+		
+		readings.add(event);
+		
+		
+		//TODO: look for acceleration reads in the opposite direction or very low to end the cast.
+		
+	}
+	
+	/**
+	 * At the end of the cast, analyze the data associated with it and determine a cast distance (or failure)
+	 * Launch the Reeler activity if the distance was large enough
+	 */
+	public void endCast() {
+		sensorManager.unregisterListener(this);
+		
+		castDistance = 0;
+		
+		for (SensorEvent event : readings) {
+			Long timeDelta = (long) ((event.timestamp - lastTimestamp) * 10E-9);
+			castDistance += timeDelta * Math.abs(event.values[0]) + timeDelta * Math.abs(event.values[1]);
+			lastTimestamp = event.timestamp;
 		}
-		else casting = false;
+    	
+		Log.d(TAG, "Cast Distance: " + castDistance);
+		
+		//check for a weak cast and try again if it was really bad.
+		if (castDistance < 25) {
+			//TODO: play an audio track about not casting far enough
+			casting = false;
+			return;
+		}
+		
+		vibrotron.vibrate(castPattern, -1);
+		
+		//play the casting audio.
+		SoundManager.playSound(1, 1);
+		if (audioTask != null) audioTask.cancel(true);
+		
+		//TODO: launch the cast animation, wait for it to finish before doing the following try block
+		
+		//Free up listeners, hardware, etc. and launch the Reeler Activity.
+		try {
+        	Intent ourIntent = new Intent(Caster.this, Class.forName("org.MAG.Reeler"));
+        	ourIntent.putExtra("CastDistance", castDistance);
+        	sensorManager.unregisterListener(this);
+        	vibrotron = null;
+        	sensorManager = null;
+        	casterBackground.setOnTouchListener(null);
+        	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(ourIntent);
+			casting = false;
+			finish();
+		} catch (ClassNotFoundException ex) {
+			Log.e(TAG, "Failed to jump to another activity");
+		}
 	}
 	
 	/**

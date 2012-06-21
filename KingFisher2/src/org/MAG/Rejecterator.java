@@ -107,7 +107,9 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 				sensorManager.unregisterListener(this);
 				
 				//TODO: asynctask to shrink, move, and rotate the sprite we're throwing back.
-				//TODO: jump to next activity!
+				
+				//TODO: audio - "let's go back to the docks." or "let's try to catch something better."
+				
 				vibrotron.vibrate(1000);
 				if (caught.isKing()) {
 					SoundManager.playSound(1, 1);
@@ -123,24 +125,33 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 					if (LevelSelection.getLevel() + 1 <= 3) {
 						LevelSelection.setLevel(LevelSelection.getLevel() + 1);
 					}
+					
+					if (audioTask != null) audioTask.cancel(true);
+					
+					try { //TODO: maybe we should go back to the casting activity if we didn't catch the king.
+	                	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.LevelSelection"));
+	                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	        			startActivity(ourIntent);
+	        			finish();
+	        		} catch (ClassNotFoundException ex) {
+	        			Log.e(TAG, "Failed to jump to another activity");
+	        		}
+					
 				}
 				else {
 					SoundManager.playSound(2, 1);
+					
+					if (audioTask != null) audioTask.cancel(true);
+					
+					try {
+	                	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.Caster"));
+	                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	        			startActivity(ourIntent);
+	        			finish();
+	        		} catch (ClassNotFoundException ex) {
+	        			Log.e(TAG, "Failed to jump to another activity");
+	        		}
 				}
-				
-				//TODO: audio - "let's go back to the docks." or "let's try to catch something better."
-				if (audioTask != null) audioTask.cancel(true);
-				
-				
-				try { //TODO: maybe we should go back to the casting activity if we didn't catch the king.
-                	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.LevelSelection"));
-                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        			startActivity(ourIntent);
-        			finish();
-        		} catch (ClassNotFoundException ex) {
-        			Log.e(TAG, "Failed to jump to another activity");
-        		}
-				
 			}
 		}
 	}
