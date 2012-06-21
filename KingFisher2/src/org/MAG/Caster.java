@@ -119,15 +119,18 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 
 	
 	/**
-	 * TODO: implement the new approach. find the distance of the cast, then launch the animation, etc.
+	 * The sensor listener is only active when the user's finger is down. We are adding readings to the list.
+	 * 
+	 * @param event from the accelerometer
 	 */
 	public void onSensorChanged(SensorEvent event) {
 		
 		readings.add(event);
 		
-		
-		//TODO: look for acceleration reads in the opposite direction or very low to end the cast.
-		
+		/**Log.d(TAG, "axis 0: " + event.values[0] + ", axis 1: " + event.values[1]);
+		if (SensorManager.GRAVITY_EARTH > Math.abs(event.values[0]) + Math.abs(event.values[1])) {
+			endCast();
+		}*/
 	}
 	
 	/**

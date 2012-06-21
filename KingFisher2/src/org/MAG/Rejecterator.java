@@ -128,7 +128,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 					
 					if (audioTask != null) audioTask.cancel(true);
 					
-					try { //TODO: maybe we should go back to the casting activity if we didn't catch the king.
+					try {
 	                	Intent ourIntent = new Intent(Rejecterator.this, Class.forName("org.MAG.LevelSelection"));
 	                	ourIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	        			startActivity(ourIntent);
