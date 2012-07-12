@@ -147,7 +147,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 		return hookedObject;
 	}
 	
-	//TODO: populate these now! add more assets in when we can.
+	//TODO: populate these now! add more assets in when we can. modify levels as needed. maybe we can do this from an xml file or something like that later on.
 	private void fillPool() {
 		
 		Sprite napoleonSprite = new Sprite(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite1), 0.5f, 0.5f, 0, Sprite.ALIGNMENT_CENTER);

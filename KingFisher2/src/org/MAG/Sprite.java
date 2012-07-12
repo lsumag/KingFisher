@@ -39,6 +39,8 @@ public class Sprite {
 		this.x = x;
 		this.y = y;
 		this.rotation = rotation;
+		
+		//setting the x- and y-alignments based on the int alignment we passed in
 		switch (alignment) {
 		
 		case ALIGNMENT_CENTER:
@@ -93,10 +95,18 @@ public class Sprite {
 		return bmp;
 	}
 	
+	/**
+	 * Get the rotation of the Sprite in degrees
+	 * @return rotation in degrees
+	 */
 	public float getRotation() {
 		return rotation;
 	}
 	
+	/**
+	 * Set the rotation of the Sprite in degrees
+	 * @param r rotation in degrees
+	 */
 	public void setRotation(float r) {
 		rotation = r;
 	}

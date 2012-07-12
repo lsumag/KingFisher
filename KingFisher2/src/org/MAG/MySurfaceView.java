@@ -74,6 +74,7 @@ public class MySurfaceView extends SurfaceView {
 					
 					//image's rotation, x coordinate of rotation, y coordinate of rotation
 					matrix.setRotate(sprite.getRotation(), this.getWidth() * sprite.getX() + sprite.getImage().getWidth() * (sprite.getAlignX() - 0.5f), sprite.getY() * this.getHeight() + sprite.getImage().getHeight() * (sprite.getAlignY() - 0.5f));
+					//matrix.setRotate(sprite.getRotation(), this.getWidth() * sprite.getX() - sprite.getImage().getWidth(), this.getHeight() * sprite.getY());
 					
 					canvas.drawBitmap(sprite.getImage(), matrix, paint);
 					matrix.reset();

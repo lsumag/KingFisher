@@ -31,6 +31,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	//foreground view
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
+	private Canvas canvas;
 	
 	//the king you caught.
 	private CatchableObject caught;
@@ -181,7 +182,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	 */
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
-	        Canvas canvas = holder.lockCanvas();
+	        canvas = holder.lockCanvas();
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
         }
