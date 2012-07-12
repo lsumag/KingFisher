@@ -36,6 +36,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private ImageView background;
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
+	private Canvas canvas;
 	
 	private SoundManager soundManager;
 	private Vibrator vibrotron;
@@ -426,7 +427,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 */
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
-	        Canvas canvas = holder.lockCanvas();
+	        canvas = holder.lockCanvas();
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
         }

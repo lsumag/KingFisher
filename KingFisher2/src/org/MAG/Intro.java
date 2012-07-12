@@ -20,7 +20,7 @@ public class Intro extends Activity implements OnTouchListener, MediaPlayer.OnCo
 	
 	/** TODO: this can probably all be tossed into KingFisher2Activity instead of having its own Activity
 	 * TODO: activity stack planning.
-	 * mode selection will be the root of the back stack.
+	 * mode selection will be the root of the back stack when it exists?
 	 * level selection will stay on as well.
 	 * 
 	 * 

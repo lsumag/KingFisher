@@ -27,6 +27,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	//foreground view
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
+	private Canvas canvas;
 	
 	private SoundManager soundManager;
 	private SensorManager sensorManager;
@@ -169,7 +170,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	 */
 	private void drawSprites() {
 		if (holder.getSurface().isValid()) {
-	        Canvas canvas = holder.lockCanvas();
+	        canvas = holder.lockCanvas();
 	        foreground.draw(canvas);
 	        holder.unlockCanvasAndPost(canvas);
         }
@@ -177,6 +178,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	
 	/**
 	 * Task to handle the narrator giving instructions to the player
+	 * This one tells the player to throw the catch back. It repeats every 10 seconds after the first one.
 	 * @author undergear
 	 *
 	 */
