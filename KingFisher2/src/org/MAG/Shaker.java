@@ -41,6 +41,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 	//hardware and a shake previous accelerometer reading
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
+	private SoundManager soundManager;
 	private Vibrator vibrotron;
 	private float lastReading;
 	private float accelerationThreshold = 2.5f;
@@ -71,8 +72,8 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         holder.setFormat(PixelFormat.TRANSPARENT);
         
         holder.addCallback(this);
-        
-		SoundManager.loadSounds(SoundManager.SHAKABLE);
+        soundManager = SoundManager.getInstance();
+		soundManager.loadSounds(SoundManager.SHAKABLE);
 		
 		vibrotron = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
@@ -107,39 +108,36 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
         totalAcceleration += Math.pow(event.values[SensorManager.DATA_Y]/SensorManager.GRAVITY_EARTH, 2.0);
         totalAcceleration += Math.pow(event.values[SensorManager.DATA_Z]/SensorManager.GRAVITY_EARTH, 2.0);
         totalAcceleration = Math.sqrt(totalAcceleration);
-       
+        
         if ((totalAcceleration < accelerationThreshold) && (lastReading > accelerationThreshold)) {
-        	Log.e("KingFisher", "SHAKE!");
         	timbersShivered++;
         	
         	vibrotron.vibrate(300);
-        	SoundManager.playSound(1, 1);
+        	soundManager.playSound(1, 1);
         	
         	//beat up the king, make him drop treasure based on how many shakes we've done.
         	//TODO: we should look up the drawables based on which level we're on.
         	switch (timbersShivered) { //TODO: set cases to add coins to the surfaceview. we need falling coins now. rotate the king a bit more.
         	case 5:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite2));
-        		king.setRotation(5.0f);
+        		
         		break;
         	case 7:
         		foreground.addSprite(coinPile);
-        		king.setRotation(0.0f);
         		break;
         	case 10:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite3));
-        		king.setRotation(-5.0f);
         		break;
         	case 12:
         		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile2));
-        		king.setRotation(0.0f);
+        		
         	case 15:
         		king.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.napoleon_sprite4));
-        		king.setRotation(5.0f);
+        		
         		break;
         	case 17:
         		coinPile.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.coin_pile3));
-        		king.setRotation(0.0f);
+        		
         		break;
         	case 20:
         		sensorManager.unregisterListener(this);
@@ -208,7 +206,7 @@ public class Shaker extends Activity implements SensorEventListener, SurfaceHold
 			//TODO: based on the level, play audio!
 			switch (LevelSelection.getLevel()) {
 			case 0:
-				SoundManager.playSound(2, 1);
+				soundManager.playSound(2, 1);
 				break;
 			default:
 				break;

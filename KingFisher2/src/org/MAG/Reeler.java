@@ -37,6 +37,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
 	
+	private SoundManager soundManager;
 	private Vibrator vibrotron;
 	
 	private WaitForHookTask waitTask; //AsyncTask - while waiting for a bite
@@ -82,6 +83,8 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        soundManager = SoundManager.getInstance();
+        
         settings = getApplicationContext().getSharedPreferences("myPrefs", 0);
         
         lineStrength = settings.getInt("LineStrength", 100);
@@ -114,7 +117,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
         minusHalfHeight = -height/2;
         minusHalfWidth = -width/2;
         
-        SoundManager.loadSounds(SoundManager.REELABLE);
+        soundManager.loadSounds(SoundManager.REELABLE);
         
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         
@@ -188,7 +191,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 	 */
 	private void hook() {		
 		vibrotron.vibrate(500);
-		SoundManager.playSound(2, 1); //TODO: notify audio task
+		soundManager.playSound(2, 1); //TODO: notify audio task
 		
 		int randomInt = random.nextInt(pool.get(LevelSelection.getLevel()).size());
 		
@@ -386,7 +389,7 @@ public class Reeler extends Activity implements OnTouchListener, SurfaceHolder.C
 			//Log.d(TAG, "angular delta: " + angularDelta + ", distance: " + distance);
 			
 			//TODO: change how often this is played based on the rate of reeling. we might also want to have the line take damage if too fast. warning audio, too.
-			SoundManager.playSound(4, 0.7f);
+			soundManager.playSound(4, 0.7f);
 			vibrotron.vibrate(50);
 			
 			//move the catch closer and see if we caught it yet

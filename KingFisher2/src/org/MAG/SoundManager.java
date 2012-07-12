@@ -49,7 +49,7 @@ public class SoundManager {
 	 * 
 	 * @param theContext The Application context
 	 */
-	public static void initSounds(Context theContext) 
+	public void initSounds(Context theContext) 
 	{ 
 		 mContext = theContext;
 	     mSoundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
@@ -63,7 +63,7 @@ public class SoundManager {
 	 * @param Index - The Sound Index for Retrieval
 	 * @param SoundID - The Android ID for the Sound asset.
 	 */
-	public static void addSound(int Index,int SoundID)
+	public void addSound(int Index,int SoundID)
 	{
 		mSoundPoolMap.put(Index, mSoundPool.load(mContext, SoundID, 1));
 	}
@@ -72,7 +72,7 @@ public class SoundManager {
 	 * Loads the various sound assets
 	 * @param: state - game state
 	 */
-	public static boolean loadSounds(int state)
+	public boolean loadSounds(int state)
 	{
 		mAudioManager.unloadSoundEffects();
 		
@@ -131,7 +131,7 @@ public class SoundManager {
 	 * @param index - The Index of the Sound to be played
 	 * @param speed - The Speed to play not, not currently used but included for compatibility
 	 */
-	public static void playSound(int index,float speed) 
+	public void playSound(int index,float speed) 
 	{ 		
 		float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
 		streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -142,7 +142,7 @@ public class SoundManager {
 	 * Stop a Sound
 	 * @param index - index of the sound to be stopped
 	 */
-	public static void stopSound(int index)
+	public void stopSound(int index)
 	{
 		mSoundPool.stop(mSoundPoolMap.get(index));
 	}
@@ -150,7 +150,7 @@ public class SoundManager {
 	/**TODO: call me onDestroy of any activity.
 	 * Release sound assets, clear the hashmap, unload the audio manager, destroy the static instance
 	 */
-	public static void cleanup()
+	public void cleanup()
 	{
 		if (!(mSoundPool == null))
 			mSoundPool.release();

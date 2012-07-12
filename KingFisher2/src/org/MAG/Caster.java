@@ -25,6 +25,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 
 	private static final String TAG = "Caster";
 	
+	private SoundManager soundManager;
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -63,6 +64,8 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         
         audioTask = new AudioTask();
         
+        soundManager = SoundManager.getInstance();
+        
         //TODO: background animation. we'll need a mysurfaceview
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
@@ -80,7 +83,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	public void onResume() {
 		super.onResume();
 		
-        SoundManager.loadSounds(SoundManager.CASTABLE);
+        soundManager.loadSounds(SoundManager.CASTABLE);
 		
         audioTask.execute();
 	}
@@ -160,7 +163,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		vibrotron.vibrate(castPattern, -1);
 		
 		//play the casting audio.
-		SoundManager.playSound(1, 1);
+		soundManager.playSound(1, 1);
 		if (audioTask != null) audioTask.cancel(true);
 		
 		//TODO: launch the cast animation, wait for it to finish before doing the following try block
@@ -198,7 +201,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 				Log.e(TAG, e1.getMessage());
 			}
 			//"cast away!"
-			SoundManager.playSound(2, 1);
+			soundManager.playSound(2, 1);
 			
 			while (true) {
 				try {

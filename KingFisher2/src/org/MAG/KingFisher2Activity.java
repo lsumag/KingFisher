@@ -17,6 +17,8 @@ public class KingFisher2Activity extends Activity {
 	
 	public final String TAG = "KingFisher";
 	
+	private SoundManager soundManager;
+	
 	/**
 	 * Set the app fullscreen and portrait with no title bar, grab a static instance of SoundManager, load up the intro activity
 	 * 
@@ -33,8 +35,8 @@ public class KingFisher2Activity extends Activity {
         setContentView(R.layout.main);
         
         //grab a static instance and set up the SoundManager.
-        SoundManager.getInstance();
-        SoundManager.initSounds(getApplicationContext());
+        soundManager = SoundManager.getInstance();
+        soundManager.initSounds(getApplicationContext());
         
         //Launch the Intro Activity
         try {

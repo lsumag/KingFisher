@@ -34,6 +34,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 	public static final int LEVEL_UNLOCKED = 1;
 	public static final int LEVEL_COMPLETE = 2;
 	
+	private SoundManager soundManager;
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -71,6 +72,8 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
+		soundManager = SoundManager.getInstance();
+		
 		audioTask = new AudioTask();
 		
         //Level lock/unlocked statuses are kept in preferences.
@@ -148,7 +151,7 @@ public class LevelSelection extends Activity implements SensorEventListener, OnP
 		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 		
 		//Load up the sounds for the LevelSelection Activity!
-        SoundManager.loadSounds(SoundManager.LEVEL);
+        soundManager.loadSounds(SoundManager.LEVEL);
         
         
         audioTask.execute();

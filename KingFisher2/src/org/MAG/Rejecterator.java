@@ -28,6 +28,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 	private MySurfaceView foreground;
 	private SurfaceHolder holder;
 	
+	private SoundManager soundManager;
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private Vibrator vibrotron;
@@ -64,9 +65,8 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 		caught = Reeler.getCatch();
 		caughtSprite = caught.getSprite();
 		
-		Log.e("KingFisher", "made the Rejecterator");
-		
-		SoundManager.loadSounds(SoundManager.FLINGABLE);
+		soundManager = SoundManager.getInstance();
+		soundManager.loadSounds(SoundManager.FLINGABLE);
 		
 		vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
@@ -112,7 +112,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 				
 				vibrotron.vibrate(1000);
 				if (caught.isKing()) {
-					SoundManager.playSound(1, 1);
+					soundManager.playSound(1, 1);
 					
 					//this level is now complete.
 					settings.edit().putInt("level"+LevelSelection.getLevel(), LevelSelection.LEVEL_COMPLETE).commit();
@@ -139,7 +139,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 					
 				}
 				else {
-					SoundManager.playSound(2, 1);
+					soundManager.playSound(2, 1);
 					
 					if (audioTask != null) audioTask.cancel(true);
 					
@@ -191,7 +191,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 				Log.e(TAG, e1.getMessage());
 			}
 			//"throw it back"
-			SoundManager.playSound(6, 1);
+			soundManager.playSound(6, 1);
 			
 			while (true) {
 				try {
@@ -200,7 +200,7 @@ public class Rejecterator extends Activity implements SensorEventListener, Callb
 					Log.e(TAG, e.getMessage());
 				}
 				//"throw it back"
-				SoundManager.playSound(6, 1);
+				soundManager.playSound(6, 1);
 			}
 		}
 	}
