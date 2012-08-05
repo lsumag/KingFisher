@@ -21,19 +21,31 @@ import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
+/**
+ * The Caster Activity is where the player actually casts the rod in an attempt to catch a king. 
+ * It is responsible for bundling up a cast distance (int) and sending that to the Reeler class.
+ * 
+ * The user interaction goal is to have this roughly simulate casting a real fishing rod.
+ * The user should put a finger down on the touch screen of the device and then swing it forward in their hand, releasing the finger at the end of the cast.
+ * 
+ * @author undergear
+ *
+ */
 public class Caster extends Activity implements OnTouchListener, SensorEventListener {
 
 	private static final String TAG = "Caster";
 	
-	private SoundManager soundManager;
+	private SoundManager soundManager; //this is a reference to a Singleton, used in all Activities in the package that use short audio clips.
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
-	private Vibrator vibrotron;
 	
+	private Vibrator vibrotron;
 	private final long[] castPattern = {0, 50, 50, 50, 50, 50, 50, 50, 50};
 	
 	private ImageView casterBackground;
-	//TODO: we may need an overlay for sprites
+	
+	//TODO: Seriously, we need some more art!
+	//TODO: we may need a MySurfaceView for sprites
 	
 	private AudioTask audioTask;
 	
@@ -66,7 +78,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
         
         soundManager = SoundManager.getInstance();
         
-        //TODO: background animation. we'll need a mysurfaceview
+        //TODO: background animation once we get the assets.
         vibrotron = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         sensorManager = (SensorManager)getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -89,7 +101,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	}
 
 	/**
-	 * Listener called when the screen is touched. Only the casterBackground should be using this listener.
+	 * Listener called when the screen is touched. Only the casterBackground should be subscribed to this listener!
 	 * Down events allow the user to cast, Up events prevent it.
 	 * 
 	 * @param v the View that has been touched. this should only be casterBackground!
@@ -101,10 +113,11 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	    case MotionEvent.ACTION_DOWN:
 	    	casting = true;
 	    	lastTimestamp = System.nanoTime();
-	    	sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+	    	sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 	    	readings = new ArrayList<SensorEvent>();
 	    	break;
 	    case MotionEvent.ACTION_UP:
+	    	sensorManager.unregisterListener(this);
 	    	if (casting)
 	    		endCast();
 	    	break;
@@ -113,7 +126,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	}
 
 	/**
-	 * Sensor accuracy has changed. We don't need to worry about this.
+	 * Sensor accuracy has changed. We don't need to worry about this for our purposes.
 	 * 
 	 * @param sensor the sensor that has been affected. Should be accelerometer
 	 * @param accuracy the new accuracy setting for that sensor
@@ -122,7 +135,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 
 	
 	/**
-	 * The sensor listener is only active when the user's finger is down. We are adding readings to the list.
+	 * The sensor listener is only active when the user's finger is down. We are adding readings to the list for processing later.
 	 * 
 	 * @param event from the accelerometer
 	 */
@@ -137,14 +150,15 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	}
 	
 	/**
-	 * At the end of the cast, analyze the data associated with it and determine a cast distance (or failure)
+	 * At the end of the cast, analyze the data associated with it and determine a cast distance (or failure if too short)
 	 * Launch the Reeler activity if the distance was large enough
 	 */
 	public void endCast() {
-		sensorManager.unregisterListener(this);
 		
 		castDistance = 0;
 		
+		//We're going to do some really inaccurate numerical integration for these readings. Rough results work well enough for this purpose on tested devices.
+		//TODO: Test more devices. Currently used EVO4G, EVO3D, Galaxy Nexus, and older Nexus model. 
 		for (SensorEvent event : readings) {
 			Long timeDelta = (long) ((event.timestamp - lastTimestamp) * 10E-9);
 			castDistance += timeDelta * Math.abs(event.values[0]) + timeDelta * Math.abs(event.values[1]);
@@ -155,7 +169,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		
 		//check for a weak cast and try again if it was really bad.
 		if (castDistance < 25) {
-			//TODO: play an audio track about not casting far enough
+			//TODO: play an audio track about not casting far enough. We need that asset still.
 			casting = false;
 			return;
 		}
@@ -164,9 +178,11 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 		
 		//play the casting audio.
 		soundManager.playSound(1, 1);
+		
+		//kill the audio task
 		if (audioTask != null) audioTask.cancel(true);
 		
-		//TODO: launch the cast animation, wait for it to finish before doing the following try block
+		//TODO: launch a cast animation/video when we get it, wait for it to finish before doing the following try block
 		
 		//Free up listeners, hardware, etc. and launch the Reeler Activity.
 		try {
@@ -186,7 +202,7 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 	}
 	
 	/**
-	 * Task to handle the narrator giving instructions to the player
+	 * Task to handle the narrator giving instructions to the player. He'll speak every 10 seconds if the player isn't doing anything.
 	 * @author undergear
 	 *
 	 */
@@ -209,7 +225,10 @@ public class Caster extends Activity implements OnTouchListener, SensorEventList
 				} catch (InterruptedException e) {
 					Log.e(TAG, e.getMessage());
 				}
-				//TODO: play audio instructions here.
+				if (casting == false) {
+					//TODO: play audio instructions here. We should have something telling the player exactly how to cast.
+					soundManager.playSound(2, 1); //"cast away!" for now.
+				}
 			}
 		}
 	}
